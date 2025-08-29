@@ -242,7 +242,7 @@ function fitCanvasToViewport() {
   const canvas = document.getElementById("board");
   const controlsH = document.getElementById("touchControls")?.offsetHeight || 0;
   const goalbarH = document.getElementById("goalbar")?.offsetHeight || 0;
-  const EXTRA_BOTTOM = 90;
+  const EXTRA_BOTTOM = 120;
   document.documentElement.style.setProperty("--extra-bottom", EXTRA_BOTTOM + "px");
   const vw = window.visualViewport?.width ?? window.innerWidth;
   const vvh = window.visualViewport?.height ?? window.innerHeight;
