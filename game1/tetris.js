@@ -99,6 +99,10 @@ class Tetris {
         case "ArrowUp": this.curr.rotate(this.board); break;
         case " ": this.curr.hardDrop(this.board); this.drop(true); break;
       }
+
+      if (["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", " "].includes(e.key)) {
+        e.preventDefault();
+      }
     });
 
     setupTouchControls(this);
@@ -238,7 +242,7 @@ function fitCanvasToViewport() {
   const canvas = document.getElementById("board");
   const controlsH = document.getElementById("touchControls")?.offsetHeight || 0;
   const goalbarH = document.getElementById("goalbar")?.offsetHeight || 0;
-  const EXTRA_BOTTOM = 28;
+  const EXTRA_BOTTOM = 36;
   const vw = window.visualViewport?.width ?? window.innerWidth;
   const vvh = window.visualViewport?.height ?? window.innerHeight;
   const vh = vvh - controlsH - goalbarH - EXTRA_BOTTOM - 8;
@@ -321,7 +325,7 @@ function setupTouchControls(game) {
     }, 45); // ← 落下速度（30〜80msで調整可）
   };
 
-  function onStart(e){
+  function onStart(e) {
     if (!game || !game.live) return;
     movedAny = false;
     const p = pt(e);
@@ -331,56 +335,56 @@ function setupTouchControls(game) {
     e.preventDefault();
   }
 
-  function onMove(e){
+  function onMove(e) {
     if (!game || !game.live) return;
     const p = pt(e);
     const dx = p.x - appliedX;
-    const u  = unit();
+    const u = unit();
 
     if (Math.abs(p.x - startX) > 6 || Math.abs(p.y - startY) > 6) movedAny = true;
 
-    if (Math.abs(dx) >= u){
+    if (Math.abs(dx) >= u) {
       const steps = (dx > 0) ? Math.floor(dx / u) : Math.ceil(dx / u);
-      const dir   = steps > 0 ? 1 : -1;
-      for (let i=0; i<Math.abs(steps); i++) { game.curr?.move(dir, 0, game.board); }
+      const dir = steps > 0 ? 1 : -1;
+      for (let i = 0; i < Math.abs(steps); i++) { game.curr?.move(dir, 0, game.board); }
       appliedX += steps * u;
       if (typeof game.draw === "function") game.draw();
     }
 
-    if (movedAny && longPressTimer){ clearTimeout(longPressTimer); longPressTimer = null; } // 誤爆防止
+    if (movedAny && longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; } // 誤爆防止
     e.preventDefault();
   }
-  function onEnd(e){
+  function onEnd(e) {
     if (!game) return;
     const p = pt(e);
     const dt = Date.now() - startT;
     const moved = Math.hypot(p.x - startX, p.y - startY);
 
-    if (softDropTimer){ clearInterval(softDropTimer); softDropTimer = null; } // 長押し停止
+    if (softDropTimer) { clearInterval(softDropTimer); softDropTimer = null; } // 長押し停止
 
     // タップ（短時間＆移動ほぼなし）は回転
-    if (dt <= 250 && moved < 12 && !movedAny){
+    if (dt <= 250 && moved < 12 && !movedAny) {
       if (game.live && game.curr) game.curr.rotate(game.board);
     }
 
     clearTimers();
     e.preventDefault();
   }
-  surface.addEventListener("touchstart", onStart, { passive:false });
-  surface.addEventListener("touchmove",  onMove,  { passive:false });
-  surface.addEventListener("touchend",   onEnd,   { passive:false });
-  surface.addEventListener("touchcancel",(e)=>{ clearTimers(); e.preventDefault(); }, { passive:false });
+  surface.addEventListener("touchstart", onStart, { passive: false });
+  surface.addEventListener("touchmove", onMove, { passive: false });
+  surface.addEventListener("touchend", onEnd, { passive: false });
+  surface.addEventListener("touchcancel", (e) => { clearTimers(); e.preventDefault(); }, { passive: false });
 
   surface.addEventListener("mousedown", onStart);
   surface.addEventListener("mousemove", onMove);
-  surface.addEventListener("mouseup",   onEnd);
+  surface.addEventListener("mouseup", onEnd);
 }
 
 // ====== 起動 ======
 window.addEventListener("load", () => {
   // ボタンUIは使わないので非表示にする（CSS変更なしで対応）
-  ["#touchControls","#btnLeft","#btnRight","#btnDrop","#btnRotate"].forEach(sel=>{
-    document.querySelectorAll(sel).forEach(el => { el.style.display="none"; el.style.visibility="hidden"; });
+  ["#touchControls", "#btnLeft", "#btnRight", "#btnDrop", "#btnRotate"].forEach(sel => {
+    document.querySelectorAll(sel).forEach(el => { el.style.display = "none"; el.style.visibility = "hidden"; });
   });
 
   updateGoalText();
