@@ -14,13 +14,14 @@ body {
   min-height: 100dvh;
   height: 100vh;
   height: 100dvh;
+  min-height: -webkit-fill-available;
+  padding-bottom: calc(max(0px, env(safe-area-inset-bottom)) + 28px);
   background: #121212;
   color: #e0e0e0;
   font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
   display: grid;
   grid-template-rows: auto 1fr auto;
   overflow: hidden;
-  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* 勝利条件バー */
@@ -211,3 +212,13 @@ body {
     font-size: 24px;
   }
 }
+
+/* === 追加：ボタンUIは使わない・ジェスチャー前提 === */
+#touchControls,
+#btnLeft, #btnRight, #btnDrop, #btnRotate {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* キャンバス上でスワイプ/タップを拾う（対応ブラウザ） */
+#board { touch-action: none; }
