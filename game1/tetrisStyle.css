@@ -15,7 +15,7 @@ body {
   height: 100vh;
   height: 100dvh;
   min-height: -webkit-fill-available;
-  padding-bottom: calc(max(0px, env(safe-area-inset-bottom)) + 28px);
+  padding-bottom: calc(max(0px, env(safe-area-inset-bottom)) + 40px);
   background: #121212;
   color: #e0e0e0;
   font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
