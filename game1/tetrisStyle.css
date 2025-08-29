@@ -11,12 +11,16 @@ body {
 
 body {
   min-height: 100vh;
+  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
   background: #121212;
   color: #e0e0e0;
   font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
   display: grid;
   grid-template-rows: auto 1fr auto;
   overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* 勝利条件バー */
@@ -45,7 +49,7 @@ body {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
-  padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  padding: 10px 12px max(10px, env(safe-area-inset-bottom));
   background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, .25));
 }
 
