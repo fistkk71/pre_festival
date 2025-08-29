@@ -1,0 +1,6 @@
+/* tetris-gestures.css — ボタンUIを隠す＆ジェスチャー前提に */
+#touchControls{ display:none !important; visibility:hidden !important; }
+#btnLeft,#btnRight,#btnDrop,#btnRotate{ display:none !important; }
+
+/* キャンバス上でスワイプを拾えるように（対応ブラウザ） */
+#board{ touch-action:none; }
