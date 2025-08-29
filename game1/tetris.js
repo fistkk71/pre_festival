@@ -75,7 +75,7 @@ class Tetris {
     this.next = this.randPiece();
 
     this.lines = 0;
-    this.dropMs = 550; // 固定
+    this.dropMs = 550;
     this.timer = 0;
     this.live = true;
     this.prev = 0;
@@ -102,8 +102,10 @@ class Tetris {
     });
 
     setupTouchControls(this);
+
     window.addEventListener("resize", fitCanvasToViewport);
     window.visualViewport?.addEventListener("resize", fitCanvasToViewport);
+    window.visualViewport?.addEventListener("scroll", fitCanvasToViewport);
     window.addEventListener("orientationchange", () => setTimeout(fitCanvasToViewport, 300));
   }
 
@@ -142,32 +144,32 @@ class Tetris {
   softDrop() { this.curr.move(0, 1, this.board); }
 
 
-drop(hard=false){
-  if (!this.curr.move(0,1,this.board)) {
+  drop(hard = false) {
+    if (!this.curr.move(0, 1, this.board)) {
 
-    const lockedAboveTop = this.curr.mat.some((row, yy) =>
-      row.some((v, xx) => v && (this.curr.y + yy) < 0)
-    );
+      const lockedAboveTop = this.curr.mat.some((row, yy) =>
+        row.some((v, xx) => v && (this.curr.y + yy) < 0)
+      );
 
-    this.curr.lock(this.board);
-    this.clearLines();
+      this.curr.lock(this.board);
+      this.clearLines();
 
-    if (lockedAboveTop) {
-      this.live = false;
-      showGameOverSplash();
-      return;
-    }
+      if (lockedAboveTop) {
+        this.live = false;
+        showGameOverSplash();
+        return;
+      }
 
-    this.curr = this.next;
-    this.next = this.randPiece();
+      this.curr = this.next;
+      this.next = this.randPiece();
 
-    if (this.curr.collide(this.board, this.curr.x, this.curr.y, this.curr.mat)) {
-      this.live = false;
-      showGameOverSplash();
-      return;
+      if (this.curr.collide(this.board, this.curr.x, this.curr.y, this.curr.mat)) {
+        this.live = false;
+        showGameOverSplash();
+        return;
+      }
     }
   }
-}
 
 
   clearLines() {
@@ -182,7 +184,7 @@ drop(hard=false){
       this.lines += cleared;
       if (this.lines >= TARGET_LINES) {
         this.live = false;
-        showClearSplash(this.lines); // ← ボタン押下で親へ通知
+        showClearSplash(this.lines);
       }
     }
   }
@@ -236,9 +238,10 @@ function fitCanvasToViewport() {
   const canvas = document.getElementById("board");
   const controlsH = document.getElementById("touchControls")?.offsetHeight || 0;
   const goalbarH = document.getElementById("goalbar")?.offsetHeight || 0;
-  const vw = window.visualViewport?.width || window.innerWidth;
-  const vvh = window.visualViewport?.height || window.innerHeight;
-  const vh  = vvh - controlsH - goalbarH - 8;
+  const EXTRA_BOTTOM = 28;
+  const vw = window.visualViewport?.width ?? window.innerWidth;
+  const vvh = window.visualViewport?.height ?? window.innerHeight;
+  const vh = vvh - controlsH - goalbarH - EXTRA_BOTTOM - 8;
   BLOCK = Math.max(14, Math.floor(Math.min(vw / COLS, vh / ROWS)));
   const width = COLS * BLOCK;
   const height = ROWS * BLOCK;
@@ -263,7 +266,7 @@ function showClearSplash(lines) {
   const btn = document.getElementById("claimBtn");
   btn.onclick = () => {
     wrap.classList.add("hidden");
-    notifyParent(true, 0, lines);            // ここで親へ通知 → 親が動画→記録
+    notifyParent(true, 0, lines);
   };
 }
 
@@ -274,7 +277,7 @@ function showGameOverSplash() {
   const btn = document.getElementById("retryBtn");
   btn.onclick = () => {
     wrap.classList.add("hidden");
-    if (window._tetris) window._tetris.restart();  // 盤面リセットして再スタート
+    if (window._tetris) window._tetris.restart();
   };
 }
 
@@ -287,26 +290,102 @@ function notifyParent(cleared, score, lines) {
 
 // ====== タッチ操作 ======
 function setupTouchControls(game) {
-  const id = (s) => document.getElementById(s);
-  const repeat = (el, fn, every = 90) => {
-    if (!el) return;
-    let t = null;
-    const start = (e) => { e.preventDefault(); fn(); t = setInterval(fn, every); };
-    const end = () => { if (t) { clearInterval(t); t = null; } };
-    el.addEventListener("touchstart", start, { passive: false });
-    el.addEventListener("mousedown", start);
-    ["touchend", "touchcancel", "mouseup", "mouseleave"].forEach(v => el.addEventListener(v, end));
+  const canvas = document.getElementById("board");
+  const surface = canvas || document.body;
+  try { surface.style.touchAction = "none"; } catch { }
+
+  let startX = 0, startY = 0, startT = 0, appliedX = 0;
+  let movedAny = false, longPressTimer = null, softDropTimer = null;
+
+  const unit = () => {
+    const u = (typeof BLOCK === "number" && BLOCK > 0) ? Math.floor(BLOCK * 0.6) : 24;
+    return Math.max(14, Math.min(48, u));
   };
-  repeat(id("btnLeft"), () => { if (game.live) game.curr.move(-1, 0, game.board); });
-  repeat(id("btnRight"), () => { if (game.live) game.curr.move(1, 0, game.board); });
-  repeat(id("btnDrop"), () => { if (game.live) game.softDrop(); });
-  id("btnRotate")?.addEventListener("click", () => { if (game.live) game.curr.rotate(game.board); });
+  const pt = (e) => {
+    const t = (e.changedTouches && e.changedTouches[0]) || (e.touches && e.touches[0]) || e;
+    return { x: t.clientX, y: t.clientY };
+  };
+  const clearTimers = () => {
+    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    if (softDropTimer) { clearInterval(softDropTimer); softDropTimer = null; }
+  };
+  const startSoftDrop = () => {
+    if (!game || !game.live) return;
+    clearInterval(softDropTimer);
+    softDropTimer = setInterval(() => {
+      if (!game || !game.live || !game.curr) return clearTimers();
+      const beforeY = game.curr.y;
+      game.softDrop();                               // 1マス下へ
+      if (typeof game.draw === "function") game.draw();
+      if (game.curr.y === beforeY) clearTimers();    // もう下がれない
+    }, 45); // ← 落下速度（30〜80msで調整可）
+  };
+
+  function onStart(e){
+    if (!game || !game.live) return;
+    movedAny = false;
+    const p = pt(e);
+    startX = appliedX = p.x; startY = p.y; startT = Date.now();
+    clearTimers();
+    longPressTimer = setTimeout(startSoftDrop, 300); // ← 長押し判定
+    e.preventDefault();
+  }
+
+  function onMove(e){
+    if (!game || !game.live) return;
+    const p = pt(e);
+    const dx = p.x - appliedX;
+    const u  = unit();
+
+    if (Math.abs(p.x - startX) > 6 || Math.abs(p.y - startY) > 6) movedAny = true;
+
+    if (Math.abs(dx) >= u){
+      const steps = (dx > 0) ? Math.floor(dx / u) : Math.ceil(dx / u);
+      const dir   = steps > 0 ? 1 : -1;
+      for (let i=0; i<Math.abs(steps); i++) { game.curr?.move(dir, 0, game.board); }
+      appliedX += steps * u;
+      if (typeof game.draw === "function") game.draw();
+    }
+
+    if (movedAny && longPressTimer){ clearTimeout(longPressTimer); longPressTimer = null; } // 誤爆防止
+    e.preventDefault();
+  }
+  function onEnd(e){
+    if (!game) return;
+    const p = pt(e);
+    const dt = Date.now() - startT;
+    const moved = Math.hypot(p.x - startX, p.y - startY);
+
+    if (softDropTimer){ clearInterval(softDropTimer); softDropTimer = null; } // 長押し停止
+
+    // タップ（短時間＆移動ほぼなし）は回転
+    if (dt <= 250 && moved < 12 && !movedAny){
+      if (game.live && game.curr) game.curr.rotate(game.board);
+    }
+
+    clearTimers();
+    e.preventDefault();
+  }
+  surface.addEventListener("touchstart", onStart, { passive:false });
+  surface.addEventListener("touchmove",  onMove,  { passive:false });
+  surface.addEventListener("touchend",   onEnd,   { passive:false });
+  surface.addEventListener("touchcancel",(e)=>{ clearTimers(); e.preventDefault(); }, { passive:false });
+
+  surface.addEventListener("mousedown", onStart);
+  surface.addEventListener("mousemove", onMove);
+  surface.addEventListener("mouseup",   onEnd);
 }
 
 // ====== 起動 ======
 window.addEventListener("load", () => {
+  // ボタンUIは使わないので非表示にする（CSS変更なしで対応）
+  ["#touchControls","#btnLeft","#btnRight","#btnDrop","#btnRotate"].forEach(sel=>{
+    document.querySelectorAll(sel).forEach(el => { el.style.display="none"; el.style.visibility="hidden"; });
+  });
+
   updateGoalText();
   fitCanvasToViewport();
+
   const splash = document.getElementById("splash");
   const startBtn = document.getElementById("startGame");
   const start = () => { splash.style.display = "none"; window._tetris = new Tetris(); };
