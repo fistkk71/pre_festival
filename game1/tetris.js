@@ -103,6 +103,7 @@ class Tetris {
 
     setupTouchControls(this);
     window.addEventListener("resize", fitCanvasToViewport);
+    window.visualViewport?.addEventListener("resize", fitCanvasToViewport);
     window.addEventListener("orientationchange", () => setTimeout(fitCanvasToViewport, 300));
   }
 
@@ -235,8 +236,9 @@ function fitCanvasToViewport() {
   const canvas = document.getElementById("board");
   const controlsH = document.getElementById("touchControls")?.offsetHeight || 0;
   const goalbarH = document.getElementById("goalbar")?.offsetHeight || 0;
-  const vw = window.innerWidth;
-  const vh = window.innerHeight - controlsH - goalbarH - 8;
+  const vw = window.visualViewport?.width || window.innerWidth;
+  const vvh = window.visualViewport?.height || window.innerHeight;
+  const vh  = vvh - controlsH - goalbarH - 8;
   BLOCK = Math.max(14, Math.floor(Math.min(vw / COLS, vh / ROWS)));
   const width = COLS * BLOCK;
   const height = ROWS * BLOCK;
