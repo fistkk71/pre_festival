@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>マップ | 前月祭 宝探し</title>
+
+  <!-- 共通スタイル -->
+  <link rel="stylesheet" href="./css/reset.css" />
+  <link rel="stylesheet" href="./css/treasurehunt.css" />
+  <meta name="theme-color" content="#155419" />
+</head>
+
+<!-- map専用のフラグ class をBODYに付与 -->
+
+<body class="map-page">
+  <!-- ========== Header（固定） ========== -->
+  <header class="header">
+    <div class="container flex-between">
+      <div class="brand">
+        <img class="logo-mark" src="./image/treasure_icon_2.png" width="36" height="36" alt="宝探しロゴ">
+        <a class="logo" href="./index.html">Treasure&nbsp;Hunt</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========== Main（マップは上下固定の間に100%表示） ========== -->
+  <main role="main">
+    <div id="map" class="map-canvas" aria-label="所沢周辺の宝探しマップ"></div>
+
+    <!-- ヒントのパネル（下からスライド） -->
+    <aside id="panel" class="panel" aria-hidden="true">
+      <div class="panel-header">
+        <strong>ヒント一覧</strong>
+        <div style="display:flex; gap:.4rem; margin-left:auto;">
+          <button id="reset" class="btn-secondary" type="button">リセット</button>
+          <button class="panel-close" type="button" aria-label="ヒントを閉じる">×</button>
+        </div>
+      </div>
+      <div id="hint-list" class="panel-body"></div>
+    </aside>
+
+    <!-- ヒントのFAB（右下） -->
+    <button id="toggle-panel" class="fab" aria-expanded="false" aria-label="ヒントを開く">💡</button>
+
+    <!-- ▼ QRスキャン起動ボタン（左下） -->
+    <button id="scan-qr" class="fab fab--qr" aria-label="QRコードを読み取る">📷</button>
+
+    <!-- ▼ スキャナーUI（フルスクリーン） -->
+    <div id="scanner" class="scanner hidden" aria-hidden="true">
+      <div class="scanner__topbar">
+        <div class="scanner__left">
+          <button id="scan-back" class="scanner__btn scanner__btn--back" aria-label="戻る">← 戻る</button>
+        </div>
+        <div class="scanner__actions">
+          <button id="scan-torch" class="scanner__btn" aria-label="ライト切替">🔦</button>
+          <button id="scan-switch" class="scanner__btn" aria-label="カメラ切替">🔁</button>
+        </div>
+      </div>
+
+      <div class="scanner__viewport">
+        <video id="qrVideo" playsinline muted></video>
+        <canvas id="qrCanvas" class="hidden"></canvas>
+        <div class="scanner__frame"></div>
+      </div>
+
+      <div id="scan-status" class="scanner__status">カメラ起動中…</div>
+    </div>
+  </main>
+
+  <!-- ========== Footer（固定） ========== -->
+  <footer class="footer">
+    <div class="container">
+      <small>所沢キャンパス祭 前月祭 宝探し企画</small>
+    </div>
+  </footer>
+
+  <!-- 設定テンプレート：地点座標・ヒント文 -->
+  <template id="map-config" data-geojson="./tokorozawa.geojson" data-initial-zoom="16" data-qr-points='[
+      {"id":"qr1","name":"グランエミオ所沢","lat":35.786928,"lng":139.474014},
+      {"id":"qr2","name":"エミテラス所沢","lat":35.785070,"lng":139.470695},
+      {"id":"qr3","name":"シティタワー所沢クラッシィ","lat":35.786632,"lng":139.471114}
+    ]' data-qr-hints='[
+      {"id":"qr1","hint":"グランエミオ：2階で占いをやってみよう！"},
+      {"id":"qr3","hint":"所沢クラッシィ軽食でも買って休憩してみよう！"}
+    ]'>
+  </template>
+
+  <!-- ライブラリ -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js" defer></script>
+
+  <!-- マップロジック -->
+  <script src="./js/map.js"></script>
+
+<!-- 置き換え（YOUR_API_KEY はそのまま） -->
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBy_Oh_oRHjntjRW-g48N-oEovSsqClREc&callback=initMap&v=weekly&loading=async"
+  defer></script>
+</body>
+
+</html>
