@@ -25,12 +25,12 @@
 
   <main role="main" id="main">
     <div class="center-card" style="text-align:center" aria-live="polite">
-      <h2 id="qrTitle" style="margin-top:0;">QRが読み取られました!</h2>
+      <h2 id="qrTitle" style="margin-top:0;">QRが読み取られました!ミニゲームをクリアして景品をもらいましょう！</h2>
       <p id="qrPlace" style="margin:.25rem 0 1rem; color:#6b5e55"></p>
     </div>
 
     <div style="display:grid; gap:10px; margin-top:.6rem">
-      <button id="primaryCta" class="btn-start btn--wide">ゲームをプレイ</button>
+      <button id="primaryCta" class="btn-start btn--wide">ミニゲームをプレイ</button>
     </div>
 
     <!-- 画面内再生用の小枠（今はフルスクリーン再生に切替しているため未使用） -->
@@ -46,10 +46,9 @@
 
 
 
-  <template id="qr-meta" data-total="3" data-video="./image/treasure.mp4" data-points='[
+  <template id="qr-meta" data-total="1" data-video="./image/treasure.mp4" data-points='[
       {"id":"qr1","name":"グランエミオ所沢"},
-      {"id":"qr2","name":"エミテラス所沢"},
-      {"id":"qr3","name":"シティタワー所沢クラッシィ"}
+      {"id":"qr2","name":"シティタワー所沢クラッシィ"}
     ]'></template>
 
   <script type="module" src="./js/qr.js"></script>
