@@ -1,3 +1,7 @@
+
+const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fistkk71.github.io"];
+if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
+
 import { db, ensureAuthed } from "./firebase-init.js";
 import { doc, getDoc, updateDoc, serverTimestamp, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -26,7 +30,7 @@ function setButtonsComplete() {
   homeBtn && (homeBtn.textContent = "トップへ戻る", homeBtn.onclick = () => { localStorage.removeItem("uid"); location.href = "index.html"; });
 }
 async function renderVerifyQR({ uid }) {
-  const url = `${location.origin}/verify.html?uid=${encodeURIComponent(uid)}`;
+  const url = new URL(`verify.html?uid=${encodeURIComponent(uid)}`, location.href).href;
   const wrap = document.querySelector(".qr-wrap") || document.body;
   const canvas = document.getElementById("goalQr") || document.getElementById("couponQR");
   const link = document.getElementById("verifyUrl");
@@ -71,7 +75,7 @@ async function finalize() {
 
     if (found < REQUIRED) {
       timeEl.textContent = "まだゴール条件を満たしていません。";
-      saveEl.textContent = "City または Grand のどちらか1箇所でクリアしてください。";
+      saveEl.textContent = "シティタワー所沢クラッシィまたはグランエミオ所沢のどちらか1箇所でクリアしてください。";
       setButtonsIncomplete();
       return;
     }
