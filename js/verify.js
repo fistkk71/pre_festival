@@ -1,3 +1,6 @@
+const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fistkk71.github.io"];
+if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
+
 import { db, ensureAuthed } from "./firebase-init.js";
 import { doc, getDoc, updateDoc, serverTimestamp, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -11,6 +14,16 @@ const elapsedEl = document.getElementById("vElapsed");
 const redEl = document.getElementById("vRedeemed");
 const redeemBtn = document.getElementById("redeemBtn");
 const noteEl = document.getElementById("note");
+const PASS = "tokorozawa";
+const gateEl = document.getElementById("pwGate");
+const layerEl = document.getElementById("pwLayer");
+const mainEl = document.getElementById("main");
+const pwInput = document.getElementById("pwInput");
+const pwBtn = document.getElementById("pwBtn");
+const pwMsg = document.getElementById("pwMsg");
+const VERIFY_KEY = "verify_ok";
+const VERIFY_EXP = "verify_exp";
+const VERIFY_TTL_MS = 12 * 60 * 60 * 1000;
 
 const setBadge = (t, s) => { badgeEl.className = `verify-badge ${t}`; badgeEl.textContent = s; };
 const fmt = (ms) => { const s = Math.max(0, Math.floor(ms / 1000)), h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), r = s % 60; return h > 0 ? `${h}時間${m}分${r}秒` : `${m}分${r}秒`; };
@@ -32,7 +45,7 @@ async function main() {
     const teamName = data.teamName || "-";
     const members = data.members || 0;
 
-    const REQUIRED = 1; // ← 強制1に
+    const REQUIRED = 1;
     const ps = await getDocs(collection(db, "teams", uid, "points"));
     const found = ps.size;
 
@@ -87,4 +100,47 @@ async function main() {
     titleEl.textContent = "エラーが発生しました"; setBadge("warn", "通信エラー"); redeemBtn.disabled = true; noteEl.textContent = "ネットワーク状況をご確認ください。";
   }
 }
-main();
+
+function unlock() {
+  const exp = Date.now() + VERIFY_TTL_MS;
+  localStorage.setItem(VERIFY_KEY, "1");
+  localStorage.setItem(VERIFY_EXP, String(exp));
+  layerEl?.setAttribute("hidden", "");
+  document.body.classList.remove("modal-open");
+  mainEl && (mainEl.hidden = false);
+  main();
+}
+
+function boot() {
+  const ok = localStorage.getItem(VERIFY_KEY) === "1";
+  const exp = Number(localStorage.getItem(VERIFY_EXP) || 0);
+  if (ok && exp > Date.now()) {
+    localStorage.setItem(VERIFY_EXP, String(Date.now() + VERIFY_TTL_MS));
+    layerEl?.setAttribute("hidden", "");
+    document.body.classList.remove("modal-open");
+    mainEl && (mainEl.hidden = false);
+    main();
+    return;
+  }
+  layerEl?.removeAttribute("hidden");
+  document.body.classList.add("modal-open");
+  mainEl && (mainEl.hidden = true);
+  const tryAuth = () => {
+    const ok = (pwInput?.value || "").trim() === PASS;
+    if (ok) {
+      pwMsg.textContent = "";
+      unlock();
+    } else {
+      pwMsg.textContent = "パスワードが違います。";
+      pwInput?.focus();
+      pwInput?.select?.();
+    }
+  };
+  pwBtn?.addEventListener("click", tryAuth);
+  pwInput?.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") tryAuth();
+  });
+  setTimeout(() => pwInput?.focus(), 0);
+}
+
+boot();
