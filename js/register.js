@@ -7,7 +7,7 @@ import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/fir
 const form = document.getElementById("regForm") || document.getElementById("registerForm");
 const teamInput = document.getElementById("team");
 const membersSelect = document.getElementById("members");
-const agesGrid = document.getElementById("ages") /* may be null */;
+const agesGrid = document.getElementById("ages");
 const submitBtn = form?.querySelector("button[type='submit'], .btn-submit, .btn-primary");
 
 const trim = v => (v ?? "").toString().trim();
@@ -49,7 +49,7 @@ if (form) {
     try {
       await ensureAuthed();
 
-      const ages = []; // ages removed in this event
+      const ages = [];
 
       const payload = {
         teamName, members, goalRequired: 1,

@@ -1,8 +1,8 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, setPersistence, browserLocalPersistence, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js";
 
+// Firebase 設定（コンソールの値）
 const firebaseConfig = {
   apiKey: "AIzaSyAXvG30XoOxnElhMNOjVtT7_JzqOQUzcnY",
   authDomain: "pre-festival-8b772.firebaseapp.com",
@@ -14,14 +14,6 @@ const firebaseConfig = {
 };
 
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-
-const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider("6Le_C70rAAAAAKKu2nBjvMvK6NQMOh1qUvNolTgf"),
-  isTokenAutoRefreshEnabled: true,
-});
-
-// 動作確認用（本番では削除可）
-getToken(appCheck).then(t => console.log("AppCheck token:", t.token)).catch(console.error);
 
 const db   = getFirestore(app);
 const auth = getAuth(app);
