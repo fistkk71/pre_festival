@@ -13,7 +13,7 @@
 
 <body class="center-page">
   <a class="skip-link" href="#main">コンテンツへスキップ</a>
-<header class="header" role="banner">
+  <header class="header" role="banner">
     <div class="container flex-between">
       <div class="brand">
         <img class="logo-mark" src="./image/treasure_icon_2.png" width="36" height="36" alt="宝探しロゴ">
@@ -21,17 +21,17 @@
       </div>
     </div>
   </header>
-  
+
 
   <main id="main">
     <div class="center-card narrow" role="form" aria-labelledby="regTitle">
       <h2 id="regTitle" style="margin-top:0">受付（チーム登録）</h2>
       <p style="margin:.25rem 0 1rem; color:#6b5e55">
-        チーム情報を登録してください<br>
+        チーム情報を登録します<br>
         ゲーム開始後はマップを見ながらQRを探してください。
       </p>
       <form id="regForm" class="card" novalidate autocomplete="on">
-        <label for="team">チーム名（ランキング等で公開されます）</label>
+        <label for="team">チーム名<br>ランキング等で公開します</label>
         <input type="text" id="team" name="team" maxlength="40" placeholder="例）所沢探索隊" required inputmode="text"
           aria-describedby="teamHint" />
 
@@ -47,6 +47,7 @@
           <option value="8">8人</option>
           <option value="9">9人</option>
           <option value="10">10人</option>
+          <button type="submit" class="btn-submit btn--wide" style="margin-top:1rem">次へ進む</button>
         </select>
       </form>
 
@@ -56,10 +57,10 @@
     </div>
   </main>
 
-  
+
 
   <script type="module" src="./js/register.js"></script>
-<footer class="footer">
+  <footer class="footer">
     <p>2025 所沢キャンパス祭 宝探し企画</p>
   </footer>
 
