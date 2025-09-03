@@ -2,6 +2,20 @@ import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12
 import { getFirestore, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, setPersistence, browserLocalPersistence, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+import { initializeApp } from "firebase/app";
+import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "firebase/app-check";
+
+const ap = initializeApp(firebaseConfig);
+
+const appCheck = initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider("6Le_C70rAAAAAKKu2nBjvMvK6NQMOh1qUvNolTgf"),
+  isTokenAutoRefreshEnabled: true,
+});
+
+// 動作確認用ログ（本番では消してOK）
+getToken(appCheck).then(t => console.log("AppCheck token:", t.token)).catch(console.error);
+
+
 // プロジェクト設定（pre-festival）
 const CONFIG = {
   apiKey: "AIzaSyAXvG30XoOxnElhMNOjVtT7_JzqOQUzcnY",
