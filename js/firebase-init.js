@@ -2,7 +2,6 @@ import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12
 import { getFirestore, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, setPersistence, browserLocalPersistence, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// Firebase 設定（コンソールの値）
 const firebaseConfig = {
   apiKey: "AIzaSyAXvG30XoOxnElhMNOjVtT7_JzqOQUzcnY",
   authDomain: "pre-festival-8b772.firebaseapp.com",

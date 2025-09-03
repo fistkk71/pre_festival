@@ -1,5 +1,4 @@
-const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fistkk71.github.io"];
-if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
+const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fistkk71.github.io"]; if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
 
 import { db } from "./firebase-init.js";
 import {

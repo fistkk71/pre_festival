@@ -1,6 +1,3 @@
-const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fistkk71.github.io"];
-if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
-
 import { db, ensureAuthed } from "./firebase-init.js";
 import { doc, getDoc, updateDoc, serverTimestamp, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -16,7 +13,6 @@ const redeemBtn = document.getElementById("redeemBtn");
 const noteEl = document.getElementById("note");
 const PASS = "tokorozawa";
 const gateEl = document.getElementById("pwGate");
-const layerEl = document.getElementById("pwLayer");
 const mainEl = document.getElementById("main");
 const pwInput = document.getElementById("pwInput");
 const pwBtn = document.getElementById("pwBtn");
@@ -105,9 +101,8 @@ function unlock() {
   const exp = Date.now() + VERIFY_TTL_MS;
   localStorage.setItem(VERIFY_KEY, "1");
   localStorage.setItem(VERIFY_EXP, String(exp));
-  layerEl?.setAttribute("hidden", "");
-  document.body.classList.remove("modal-open");
-  mainEl && (mainEl.hidden = false);
+  if (gateEl) gateEl.style.display = "none";
+  if (mainEl) mainEl.hidden = false;
   main();
 }
 
@@ -116,15 +111,13 @@ function boot() {
   const exp = Number(localStorage.getItem(VERIFY_EXP) || 0);
   if (ok && exp > Date.now()) {
     localStorage.setItem(VERIFY_EXP, String(Date.now() + VERIFY_TTL_MS));
-    layerEl?.setAttribute("hidden", "");
-    document.body.classList.remove("modal-open");
-    mainEl && (mainEl.hidden = false);
+    if (gateEl) gateEl.style.display = "none";
+    if (mainEl) mainEl.hidden = false;
     main();
     return;
   }
-  layerEl?.removeAttribute("hidden");
-  document.body.classList.add("modal-open");
-  mainEl && (mainEl.hidden = true);
+  if (gateEl) gateEl.style.display = "";
+  if (mainEl) mainEl.hidden = true;
   const tryAuth = () => {
     const ok = (pwInput?.value || "").trim() === PASS;
     if (ok) {
@@ -140,7 +133,6 @@ function boot() {
   pwInput?.addEventListener("keydown", (e) => {
     if (e.key === "Enter") tryAuth();
   });
-  setTimeout(() => pwInput?.focus(), 0);
 }
 
 boot();

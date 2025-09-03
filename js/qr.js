@@ -1,5 +1,4 @@
-const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fistkk71.github.io"];
-if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
+const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fistkk71.github.io"]; if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
 
 import { db, ensureAuthed } from "./firebase-init.js";
 import { doc, getDoc, setDoc, collection, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -16,10 +15,10 @@ const fmt = (ms) => {
 const TOKEN_TABLE = Object.freeze({
   // 新
   "TH-GOAL-GRAND": "qr1", // グランエミオ所沢
-  "TH-GOAL-CITY": "qr2", // シティタワー所沢クラッシィ
+  "TH-GOAL-CITY": "qr3", // シティタワー所沢クラッシィ
   // 旧（必要なら片方だけ残す）
   "G7fS9LzA": "qr1",
-  "T9nDv4We": "qr2"
+  "T9nDv4We": "qr3"
 });
 
 async function init() {
@@ -31,7 +30,7 @@ async function init() {
   // 2地点のみを対象に（id は既存の map 側想定に合わせて qr1/qr3 を採用）
   const POINTS = [
     { "id": "qr1", "name": "グランエミオ所沢" },
-    { "id": "qr2", "name": "シティタワー所沢クラッシィ" }
+    { "id": "qr3", "name": "シティタワー所沢クラッシィ" }
   ];
 
   // ===== HUD =====
@@ -183,7 +182,7 @@ async function init() {
     setPrimaryCTA("ゲーム起動中…", null, { disabled: true });
     let cleared = false;
     if (key === "qr1") cleared = await playTetrisInOverlay(10);
-    else if (key === "qr2") cleared = await playDummyCountdown();
+    else if (key === "qr3") cleared = await playDummyCountdown();
     else cleared = true;
     if (!cleared) { setPrimaryCTA("再チャレンジしますか？", runFlow); return; }
     await runAfterGame();

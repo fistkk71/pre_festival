@@ -1,12 +1,3 @@
-try {
-  const _found = JSON.parse(localStorage.getItem("found") || "[]");
-  if (Array.isArray(_found) && _found.includes("qr3") && !_found.includes("qr2")) {
-    const migrated = _found.filter(x => x !== "qr3");
-    migrated.push("qr2");
-    localStorage.setItem("found", JSON.stringify(migrated));
-  }
-} catch {}
-
 "use strict";
 
 /* ---------- DOM ---------- */
@@ -262,7 +253,7 @@ function redrawCircles() {
   circlesById.clear();
 
   const points = Array.isArray(cfg.qrPoints) ? cfg.qrPoints : [];
-  const EXCLUDE_IDS = new Set(["qr3", "EMITERACE", "emiterace", "emi"]);
+  const EXCLUDE_IDS = new Set(["qr2", "EMITERACE", "emiterace", "emi"]);
 
   for (const p of points) {
     if (!p?.id || !Number.isFinite(p.lat) || !Number.isFinite(p.lng)) continue;

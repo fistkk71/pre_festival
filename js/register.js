@@ -49,7 +49,7 @@ if (form) {
     try {
       await ensureAuthed();
 
-      const ages = [];
+      const ages = []; // ages removed in this event
 
       const payload = {
         teamName, members, goalRequired: 1,
