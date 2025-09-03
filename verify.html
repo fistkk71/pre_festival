@@ -4,99 +4,63 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>引き換え確認 | 前月祭 宝探し企画（スタッフ用）</title>
+  <title>遊び方 | 前月祭 宝探し企画</title>
   <meta name="description" content="早稲田大学 所沢キャンパス祭 宝探し企画">
-  <link rel="stylesheet" href="./css/reset.css" />
+  <link rel="stylesheet" href="./css/reset.css">
   <link rel="stylesheet" href="./css/treasurehunt.css" />
   <meta name="theme-color" content="#155419" />
-  <style>
-    .verify-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: .4rem;
-      padding: .4rem .7rem;
-      border-radius: 999px;
-      font-weight: 700
-    }
-
-    .ok {
-      background: #e6f3ec;
-      color: #155419;
-      border: 1px solid #cfe8d9
-    }
-
-    .ng {
-      background: #fdecea;
-      color: #8d1d14;
-      border: 1px solid #f5c7c2
-    }
-
-    .warn {
-      background: #fff8e6;
-      color: #6a4d05;
-      border: 1px solid #f3e1b3
-    }
-  </style>
 </head>
 
 <body class="center-page">
   <a class="skip-link" href="#main">コンテンツへスキップ</a>
-<header class="header" role="banner">
+
+  <header class="header" role="banner">
     <div class="container flex-between">
       <div class="brand">
         <img class="logo-mark" src="./image/treasure_icon_2.png" width="36" height="36" alt="宝探しロゴ">
         <h1 class="logo">Treasure Hunt</h1>
       </div>
-      <div class="header-right">スタッフ用 確認ページ</div>
     </div>
   </header>
-  
 
-  <main role="main" id="main">
-    <div class="center-card" style="text-align:left">
-      <h2 id="statusTitle" style="margin-top:0">読み込み中…</h2>
-      <div id="statusBadge" class="verify-badge warn">確認中</div>
 
-      <dl class="result" style="margin:.8rem 0 1rem;">
-        <div class="result__row">
-          <dt>UID</dt>
-          <dd id="vUid">-</dd>
-        </div>
-        <div class="result__row">
-          <dt>チーム</dt>
-          <dd id="vTeam">-</dd>
-        </div>
-        <div class="result__row">
-          <dt>人数</dt>
-          <dd id="vMembers">-</dd>
-        </div>
-        <div class="result__row">
-          <dt>取得宝</dt>
-          <dd id="vFound">-</dd>
-        </div>
-        <div class="result__row">
-          <dt>所要時間</dt>
-          <dd id="vElapsed">-</dd>
-        </div>
-        <div class="result__row">
-          <dt>引き換え状況</dt>
-          <dd id="vRedeemed">-</dd>
-        </div>
-      </dl>
 
-      <div id="actionArea" style="display:flex;gap:10px;flex-wrap:wrap">
-        <button id="redeemBtn" class="btn-go primary" disabled>クーポン引き換え済みにする</button>
-        <a class="btn-go secondary" href="./index.html">トップへ</a>
+  <main id="main" role="main">
+    <div class="center-card narrow">
+
+      <section class="section-block" id="howto-block" aria-labelledby="ttl-howto">
+        <h2 id="ttl-howto" class="section-title">遊び方</h2>
+        <ol class="steps">
+          <li>グランエミオ所沢かシティタワー所沢クラッシィのいずれかの探索をしてもらいます</li>
+          <li>ミニゲームをプレイします。クリアでお宝を獲得できます</li>
+          <li>獲得したらお得なクーポン券と交換できます</li>
+          <li>・グランエミオ所沢：輪投げ50円引きクーポン券</li>
+          <li>・シティタワー所沢クラッシィ：レモンスカッシュ50円引クーポン券</li>
+        </ol>
+      </section>
+
+      <div class="section-sep" aria-hidden="true"></div>
+
+      <section class="section-block" id="safety-block" aria-labelledby="ttl-safety">
+        <h2 id="ttl-safety" class="section-title">安全に楽しむために</h2>
+        <ul class="bullets">
+          <li>歩きスマホは禁止です。周囲に注意しましょう。</li>
+          <li>施設・店舗の迷惑にならないようにお願いします。</li>
+          <li>お困りの点があれば気軽にスタッフへ声かけをお願いします。</li>
+        </ul>
+      </section>
+
+      <div class="cta-row">
+        <button id="startBtn" class="btn-start btn--wide">宝探しスタート！</button>
       </div>
 
-      <p id="note" style="margin:.6rem 0 0;color:#6b5e55"></p>
     </div>
   </main>
 
-  
 
-  <script type="module" src="./js/verify.js"></script>
-<footer class="footer">
+
+  <script type="module" src="./js/tutorial.js"></script>
+  <footer class="footer">
     <p>2025 所沢キャンパス祭 宝探し企画</p>
   </footer>
 
