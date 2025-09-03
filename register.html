@@ -27,11 +27,11 @@
     <div class="center-card narrow" role="form" aria-labelledby="regTitle">
       <h2 id="regTitle" style="margin-top:0">受付（チーム登録）</h2>
       <p style="margin:.25rem 0 1rem; color:#6b5e55">
-        チーム情報を登録すると<br>ゲームが開始されます。<br>
-        その後はマップを見ながら<br>3つのQRを探してください。
+        チーム情報を登録してください<br>
+        ゲーム開始後はマップを見ながらQRを探してください。
       </p>
       <form id="regForm" class="card" novalidate autocomplete="on">
-        <label for="team">チーム名</label>
+        <label for="team">チーム名（ランキング等で公開されます）</label>
         <input type="text" id="team" name="team" maxlength="40" placeholder="例）所沢探索隊" required inputmode="text"
           aria-describedby="teamHint" />
 
@@ -48,13 +48,6 @@
           <option value="9">9人</option>
           <option value="10">10人</option>
         </select>
-
-        <label style="margin-top:1.25rem">各メンバーの年齢</label>
-        <div id="ages" class="ages-grid" aria-live="polite" aria-relevant="additions removals"></div>
-
-        <div id="regError" role="alert" style="min-height:1.2em; margin-top:.5rem; color:#d84646"></div>
-
-        <button type="submit" class="btn-submit btn--wide" style="margin-top:1rem">次へ進む</button>
       </form>
 
       <p style="margin:.9rem 0 0; color:#5a7d70; font-size:.95rem;">

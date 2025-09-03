@@ -3,94 +3,68 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="早稲田大学 所沢キャンパス祭 宝探し企画" />
-  <title>前月祭 宝探し企画 | 所沢キャンパス祭</title>
-  <link rel="stylesheet" href="./css/reset.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ゴール | 前月祭 宝探し企画</title>
+  <meta name="description" content="早稲田大学 所沢キャンパス祭 宝探し企画">
+  <link rel="stylesheet" href="./css/reset.css" />
   <link rel="stylesheet" href="./css/treasurehunt.css" />
+  <meta name="theme-color" content="#3e2f25" />
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
 
-<body>
-  <a class="skip-link" href="#home">コンテンツへスキップ</a>
-
+<body class="center-page">
+  <a class="skip-link" href="#main">コンテンツへスキップ</a>
   <header class="header" role="banner">
     <div class="container flex-between">
       <div class="brand">
-        <img class="logo-mark" src="./image/treasure_icon_1.png" width="36" height="36" alt="宝探しロゴ">
+        <img class="logo-mark" src="./image/treasure_icon_2.png" width="36" height="36" alt="宝探しロゴ">
         <h1 class="logo">Treasure Hunt</h1>
       </div>
-      <nav id="main-nav" aria-label="メインメニュー">
-        <ul id="main-menu" class="nav-list">
-          <li><a href="#home">ホーム</a></li>
-          <li><a href="#howto">遊び方</a></li>
-          <li><a href="#rules">ルール</a></li>
-          <li><a href="#leaderboard">ランキング</a></li>
-          <li><a href="#contact">お問い合わせ</a></li>
-        </ul>
-        <button id="nav-toggle" class="nav-toggle" aria-label="メニューを開閉" aria-controls="main-menu" aria-expanded="false">
-          <span class="bar"></span><span class="bar"></span><span class="bar"></span>
-        </button>
-      </nav>
     </div>
   </header>
 
-  <main id="home">
-    <section class="hero">
-      <div class="hero-content">
-        <h2>早稲田大学 所沢キャンパス祭<br>前月祭 宝探し企画</h2>
-        <p>
-          宝探し企画へようこそ！<br>お宝を集めてお得なクーポン券を<br>ゲットしよう!
-        </p>
-        <a href="register.html" class="btn-primary">ゲームスタート</a>
-      </div>
-    </section>
+  <main role="main" id="main">
+    <div class="center-card" role="status" aria-live="polite">
+      <h2 style="margin-top:0">ゴールおめでとう！🎉</h2>
+      <div class="time" id="timeDisplay">計測中…</div>
+      <dl class="result" style="margin:.6rem 0 1rem;">
+        <div class="result__row">
+          <dt>チーム</dt>
+          <dd id="resultTeam">-</dd>
+        </div>
+        <div class="result__row">
+          <dt>人数</dt>
+          <dd id="resultMembers">-</dd>
+        </div>
 
-    <section id="howto" class="section">
-      <div class="container">
-        <h2>遊び方</h2>
-        <ol>
-          <li>マップのヒントを頼りにお宝を探す</li>
-          <li>隠されているQRコードを見つけてスキャン</li>
-          <li>ミニゲームをクリアしてお宝をゲット</li>
-          <li>お宝を見つけ出してお得なクーポン券をゲットしよう！</li>
-        </ol>
-      </div>
-    </section>
+      </dl>
 
-    <section id="rules" class="section">
-      <div class="container">
-        <h2>ルール</h2>
-        <ul>
-          <li>参加は無料、スマートフォンが必要。</li>
-          <li>歩行中のスマホ操作は禁止。</li>
-          <li>1グループ1回だけ参加可能。2回目以降のプレイはできません。</li>
-          <li>ヒントやお宝の場所をSNSに公開しない。</li>
-          <li>制限時間はイベント終了時刻まで。</li>
-        </ul>
-      </div>
-    </section>
+      <div id="saveStatus" class="save-status"></div>
 
-    <section id="leaderboard" class="section">
-      <div class="container">
-        <h2>ランキング</h2>
-        <div id="leaderboard-content" aria-live="polite"></div>
-      </div>
-    </section>
+      <section class="proof" style="margin-top:1rem;">
+        <h3 style="margin:.2rem 0 .5rem;">スタッフ確認</h3>
+        <div class="proof__wrap" style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+          <canvas id="goalQr" width="220" height="220"
+            style="background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.08)"></canvas>
+        </div>
+      </section>
 
-    <section id="contact" class="section">
-      <div class="container">
-        <h2>お問い合わせ</h2>
-        <p>主催：所沢キャンパス祭実行委員会 企画開発局 宝探し企画担当</p>
-        <p>本部電話番号：</p>
+      <p style="margin:8px 0 0;color:#6b5e55">
+        この画面または確認ページで<br>スタッフがチェックし前月祭<br>で使えるクーポン券と交換します。
+      </p>
+
+      <div style="display:flex; gap:10px; justify-content:center; margin-top:1rem; flex-wrap:wrap;">
+        <button id="rankBtn" class="btn-go primary">ランキングを見る</button>
+        <button id="homeBtn" class="btn-go secondary">トップへ戻る</button>
       </div>
-    </section>
+    </div>
   </main>
 
+  <script type="module" src="./js/goal.js"></script>
   <footer class="footer">
     <p>2025 所沢キャンパス祭 宝探し企画</p>
   </footer>
 
-  <script type="module" src="./js/index.js"></script>
 </body>
 
 </html>
