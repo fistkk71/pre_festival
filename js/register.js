@@ -1,11 +1,13 @@
-// register.js
+const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fistkk71.github.io"];
+if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
+
 import { db, ensureAuthed } from "./firebase-init.js";
 import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const form = document.getElementById("regForm") || document.getElementById("registerForm");
 const teamInput = document.getElementById("team");
 const membersSelect = document.getElementById("members");
-const agesGrid = document.getElementById("ages");
+const agesGrid = document.getElementById("ages") /* may be null */;
 const submitBtn = form?.querySelector("button[type='submit'], .btn-submit, .btn-primary");
 
 const trim = v => (v ?? "").toString().trim();
@@ -47,8 +49,7 @@ if (form) {
     try {
       await ensureAuthed();
 
-      const ages = agesGrid ? [...agesGrid.querySelectorAll("input[type='number']")]
-        .map(i => parseInt(i.value, 10)).filter(n => Number.isFinite(n) && n >= 0 && n <= 120) : [];
+      const ages = []; // ages removed in this event
 
       const payload = {
         teamName, members, goalRequired: 1,
