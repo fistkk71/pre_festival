@@ -1,3 +1,6 @@
+const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fistkk71.github.io"];
+if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
+
 import { db } from "./firebase-init.js";
 import { doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
