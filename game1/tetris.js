@@ -5,7 +5,7 @@ let BLOCK = 30;
 const GHOST_ALPHA = 0.22;
 
 const PARAMS = new URLSearchParams(location.search);
-const TARGET_LINES = Number(PARAMS.get("target") || 10);
+const TARGET_LINES = Number(PARAMS.get("target") || 7); //ここでライン設定(変更する場合はHTMLも対応)
 
 // ---- 形状・色 ----
 const SHAPES = {
@@ -75,7 +75,7 @@ class Tetris {
     this.next = this.randPiece();
 
     this.lines = 0;
-    this.dropMs = 550;
+    this.dropMs = 550; // 自動で1段落ちるまでのms
     this.timer = 0;
     this.live = true;
     this.prev = 0;
@@ -242,7 +242,7 @@ function fitCanvasToViewport() {
   const canvas = document.getElementById("board");
   const controlsH = document.getElementById("touchControls")?.offsetHeight || 0;
   const goalbarH = document.getElementById("goalbar")?.offsetHeight || 0;
-  const EXTRA_BOTTOM = 120;
+  const EXTRA_BOTTOM = 50;
   document.documentElement.style.setProperty("--extra-bottom", EXTRA_BOTTOM + "px");
   const vw = window.visualViewport?.width ?? window.innerWidth;
   const vvh = window.visualViewport?.height ?? window.innerHeight;
@@ -320,10 +320,10 @@ function setupTouchControls(game) {
     softDropTimer = setInterval(() => {
       if (!game || !game.live || !game.curr) return clearTimers();
       const beforeY = game.curr.y;
-      game.softDrop();                               // 1マス下へ
+      game.softDrop();
       if (typeof game.draw === "function") game.draw();
-      if (game.curr.y === beforeY) clearTimers();    // もう下がれない
-    }, 45); // ← 落下速度（30〜80msで調整可）
+      if (game.curr.y === beforeY) clearTimers();
+    }, 45); // 落下速度（30〜80msで調整可）
   };
 
   function onStart(e) {
