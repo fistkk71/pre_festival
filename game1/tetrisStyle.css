@@ -215,10 +215,128 @@ body {
 
 /* === 追加：ボタンUIは使わない・ジェスチャー前提 === */
 #touchControls,
-#btnLeft, #btnRight, #btnDrop, #btnRotate {
+#btnLeft,
+#btnRight,
+#btnDrop,
+#btnRotate {
   display: none !important;
   visibility: hidden !important;
 }
 
 /* キャンバス上でスワイプ/タップを拾う（対応ブラウザ） */
-#board { touch-action: none; }
+#board {
+  touch-action: none;
+}
+
+/* 1) Basic semantics restored after reset */
+strong,
+b {
+  font-weight: 700;
+}
+
+em,
+i {
+  font-style: italic;
+}
+
+h1 {
+  font-size: clamp(22px, 4.6vw, 34px);
+  font-weight: 800;
+}
+
+h2 {
+  font-size: clamp(18px, 4vw, 28px);
+  font-weight: 800;
+}
+
+p {
+  line-height: 1.6;
+}
+
+/* 2) Controls normalized (reset may unset UA styles) */
+button,
+[role="button"] {
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background: transparent;
+  border: none;
+}
+
+/* Button components in this game */
+.btn-primary,
+.tc-btn {
+  -webkit-appearance: none;
+  appearance: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* 3) Canvas rendering and layout */
+#board {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  -ms-interpolation-mode: nearest-neighbor;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 4) Safe-area & viewport tweaks */
+html {
+  height: -webkit-fill-available;
+}
+
+body {
+  overscroll-behavior-y: contain;
+  /* prevent pull-to-refresh during play */
+  padding-bottom: calc(max(0px, env(safe-area-inset-bottom)) + var(--extra-bottom, 40px));
+}
+
+/* 5) Focus ring for accessibility (reset may clear it) */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(100, 181, 246, .9);
+  border-radius: 10px;
+}
+
+/* 6) Ensure splash/cards typography after reset */
+.splash-card h1,
+.win-title,
+.over-title {
+  font-weight: 800;
+}
+
+.splash-cond strong {
+  font-weight: 900;
+}
+
+/* center the splash icon */
+.tetris-logo{
+  display: block;
+  margin: 0 auto 12px;
+  max-width: clamp(96px, 30vw, 160px);
+  height: auto;
+  align-self: center;
+}
+
+.touch-help{
+  margin: 10px auto 14px;
+  padding: 10px 12px;
+  max-width: 420px;
+  background: rgba(0,0,0,.5);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  font-size: clamp(12px, 3.5vw, 15px);
+  line-height: 1.55;
+}
+.touch-help ul{ list-style: none; margin: 0; padding: 0; }
+.touch-help li{
+  display: flex;
+  gap: .5em;
+  align-items: baseline;
+  justify-content: center;
+}
+.touch-help b{ font-weight: 800; }
