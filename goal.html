@@ -4,15 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ゴール！ | 前月祭 宝探し企画</title>
+  <title>ゴール | 前月祭 宝探し企画</title>
   <meta name="description" content="早稲田大学 所沢キャンパス祭 宝探し企画">
-
-  <!-- 共通スタイル -->
   <link rel="stylesheet" href="./css/reset.css" />
   <link rel="stylesheet" href="./css/treasurehunt.css" />
   <meta name="theme-color" content="#3e2f25" />
-
-  <!-- QR生成ライブラリ（軽量） -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
 
@@ -26,18 +22,11 @@
       </div>
     </div>
   </header>
-  <!-- ========== Header ========== -->
 
-
-  <!-- ========== Main ========== -->
   <main role="main" id="main">
     <div class="center-card" role="status" aria-live="polite">
       <h2 style="margin-top:0">ゴールおめでとう！🎉</h2>
-
-      <!-- 記録（goal.js が上書き） -->
       <div class="time" id="timeDisplay">計測中…</div>
-
-      <!-- 結果 -->
       <dl class="result" style="margin:.6rem 0 1rem;">
         <div class="result__row">
           <dt>チーム</dt>
@@ -50,12 +39,10 @@
 
       </dl>
 
-      <!-- 保存状態などのメッセージ -->
       <div id="saveStatus" class="save-status"></div>
 
-      <!-- スタッフ確認：verify.html へ遷移するQRを表示 -->
       <section class="proof" style="margin-top:1rem;">
-        <h3 style="margin:.2rem 0 .5rem;">スタッフ確認（オンライン）</h3>
+        <h3 style="margin:.2rem 0 .5rem;">スタッフ確認</h3>
         <div class="proof__wrap" style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
           <canvas id="goalQr" width="220" height="220"
             style="background:#fff;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.08)"></canvas>
@@ -66,7 +53,6 @@
         この画面または確認ページで<br>スタッフがチェックし前月祭<br>で使えるクーポン券と交換します。
       </p>
 
-      <!-- 操作ボタン -->
       <div style="display:flex; gap:10px; justify-content:center; margin-top:1rem; flex-wrap:wrap;">
         <button id="rankBtn" class="btn-go primary">ランキングを見る</button>
         <button id="homeBtn" class="btn-go secondary">トップへ戻る</button>
@@ -74,9 +60,6 @@
     </div>
   </main>
 
-
-
-  <!-- JS -->
   <script type="module" src="./js/goal.js"></script>
   <footer class="footer">
     <p>2025 所沢キャンパス祭 宝探し企画</p>
