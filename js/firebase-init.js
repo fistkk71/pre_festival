@@ -1,23 +1,9 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, setPersistence, browserLocalPersistence, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js";
 
-import { initializeApp } from "firebase/app";
-import { initializeAppCheck, ReCaptchaV3Provider, getToken } from "firebase/app-check";
-
-const ap = initializeApp(firebaseConfig);
-
-const appCheck = initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider("6Le_C70rAAAAAKKu2nBjvMvK6NQMOh1qUvNolTgf"),
-  isTokenAutoRefreshEnabled: true,
-});
-
-// 動作確認用ログ（本番では消してOK）
-getToken(appCheck).then(t => console.log("AppCheck token:", t.token)).catch(console.error);
-
-
-// プロジェクト設定（pre-festival）
-const CONFIG = {
+const firebaseConfig = {
   apiKey: "AIzaSyAXvG30XoOxnElhMNOjVtT7_JzqOQUzcnY",
   authDomain: "pre-festival-8b772.firebaseapp.com",
   projectId: "pre-festival-8b772",
@@ -27,12 +13,21 @@ const CONFIG = {
   measurementId: "G-DPE1PBS3CY",
 };
 
-const app = getApps().length ? getApps()[0] : initializeApp(CONFIG);
-const db = getFirestore(app);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+
+const appCheck = initializeAppCheck(app, {
+  provider: new ReCaptchaV3Provider("6Le_C70rAAAAAKKu2nBjvMvK6NQMOh1qUvNolTgf"),
+  isTokenAutoRefreshEnabled: true,
+});
+
+// 動作確認用（本番では削除可）
+getToken(appCheck).then(t => console.log("AppCheck token:", t.token)).catch(console.error);
+
+const db   = getFirestore(app);
 const auth = getAuth(app);
 
-setPersistence(auth, browserLocalPersistence).catch(() => { });
-enableIndexedDbPersistence(db).catch(() => { });
+setPersistence(auth, browserLocalPersistence).catch(() => {});
+enableIndexedDbPersistence(db).catch(() => {});
 
 export async function ensureAuthed() {
   if (auth.currentUser) return auth.currentUser;
