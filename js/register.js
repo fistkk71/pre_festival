@@ -2,7 +2,7 @@ const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fist
 if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
 
 import { db, ensureAuthed } from "./firebase-init.js";
-import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const form = document.getElementById("regForm") || document.getElementById("registerForm");
 const teamInput = document.getElementById("team");
@@ -47,7 +47,8 @@ if (form) {
 
     lock(submitBtn, true);
     try {
-      await ensureAuthed();
+      const user = await ensureAuthed();
+      const uid = user.uid;
 
       const ages = []; // ages removed in this event
 
@@ -58,8 +59,12 @@ if (form) {
       };
       if (ages.length) payload.ages = ages;
 
-      const ref = await addDoc(collection(db, "teams"), payload);
-      localStorage.setItem("uid", ref.id);
+      const ref = doc(db, "teams", uid);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) {
+        await setDoc(ref, payload);
+      }
+      localStorage.setItem("uid", uid);
       localStorage.setItem("teamName", teamName);
       localStorage.setItem("members", String(members));
 
