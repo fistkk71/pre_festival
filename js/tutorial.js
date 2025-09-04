@@ -1,4 +1,10 @@
-const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fistkk71.github.io"]; if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
+const CANON_ORIGIN = "https://fistkk71.github.io";
+const CANON_BASE   = "/pre_festival/";
+if (location.origin !== CANON_ORIGIN || !location.pathname.startsWith(CANON_BASE)) {
+  location.replace(CANON_ORIGIN + CANON_BASE);
+}
+
+
 
 import { db } from "./firebase-init.js";
 import { doc, getDoc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";

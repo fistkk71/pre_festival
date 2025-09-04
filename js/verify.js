@@ -1,3 +1,9 @@
+const CANON_ORIGIN = "https://fistkk71.github.io";
+const CANON_BASE   = "/pre_festival/";
+if (location.origin !== CANON_ORIGIN || !location.pathname.startsWith(CANON_BASE)) {
+  location.replace(CANON_ORIGIN + CANON_BASE);
+}
+
 const GOAL_IDS = new Set(["qr1","qr2"]);
 import { db, ensureAuthed } from "./firebase-init.js";
 import { doc, getDoc, updateDoc, serverTimestamp, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";

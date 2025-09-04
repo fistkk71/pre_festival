@@ -1,6 +1,12 @@
 import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getFirestore, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getAuth, setPersistence, browserLocalPersistence, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+const CANON_ORIGIN = "https://fistkk71.github.io";
+const CANON_BASE   = "/pre_festival/";
+if (location.origin !== CANON_ORIGIN || !location.pathname.startsWith(CANON_BASE)) {
+  location.replace(CANON_ORIGIN + CANON_BASE);
+}
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyAXvG30XoOxnElhMNOjVtT7_JzqOQUzcnY",

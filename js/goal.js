@@ -1,5 +1,10 @@
-const GOAL_IDS = new Set(["qr1", "qr2"]);
-const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fistkk71.github.io"]; if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
+const CANON_ORIGIN = "https://fistkk71.github.io";
+const CANON_BASE   = "/pre_festival/";
+if (location.origin !== CANON_ORIGIN || !location.pathname.startsWith(CANON_BASE)) {
+  location.replace(CANON_ORIGIN + CANON_BASE);
+}
+
+
 
 import { db, ensureAuthed } from "./firebase-init.js";
 import { doc, getDoc, updateDoc, serverTimestamp, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -54,11 +59,11 @@ async function renderVerifyQR({ uid }) {
 async function finalize() {
   if (uid) renderVerifyQR({ uid });
   await ensureAuthed();
-  if (!uid) { timeEl.textContent = "参加情報（UID）が見つかりません。受付からやり直してください。"; setButtonsIncomplete(); return; }
+  if (!uid) { timeEl && (timeEl.textContent = "参加情報（UID）が見つかりません。受付からやり直してください。"); setButtonsIncomplete(); return; }
   try {
     const teamRef = doc(db, "teams", uid);
     const teamSnap = await getDoc(teamRef);
-    if (!teamSnap.exists()) { timeEl.textContent = "チームデータが見つかりません。"; setButtonsIncomplete(); return; }
+    if (!teamSnap.exists()) { timeEl && (timeEl.textContent = "チームデータが見つかりません。"); setButtonsIncomplete(); return; }
 
     const data = teamSnap.data();
     const teamName = data.teamName || "-";
@@ -68,13 +73,13 @@ async function finalize() {
     const ps = await getDocs(collection(db, "teams", uid, "points"));
     const found = ps.size;
 
-    teamEl.textContent = teamName;
-    memEl.textContent = String(members);
-    treEl.textContent = `${found} / ${REQUIRED}`;
+    teamEl && (teamEl.textContent = teamName);
+    memEl && (memEl.textContent = String(members));
+    treEl && (treEl.textContent = `${found} / ${REQUIRED}`);
 
     if (found < REQUIRED) {
-      timeEl.textContent = "まだゴール条件を満たしていません。";
-      saveEl.textContent = "City または Grand のどちらか1箇所でクリアしてください。";
+      timeEl && (timeEl.textContent = "まだゴール条件を満たしていません。");
+      saveEl && (saveEl.textContent = "City または Grand のどちらか1箇所でクリアしてください。");
       setButtonsIncomplete();
       return;
     }
@@ -83,23 +88,18 @@ async function finalize() {
     if (!elapsed && startTime) {
       const startMs = startTime.toMillis();
       elapsed = Date.now() - startMs;
-      timeEl.textContent = fmt(elapsed);
-      try {
-        await updateDoc(teamRef, { endTime: serverTimestamp(), elapsed });
-        saveEl.textContent = "記録を保存しました。";
-      } catch (e) {
-        console.error(e);
-        saveEl.textContent = "保存できませんでした";
-      }
-    } else {
-      timeEl.textContent = elapsed ? fmt(elapsed) : "記録なし";
-      saveEl.textContent = "";
-    }
+      
+      timeEl && (timeEl.textContent = fmt(Date.now() - startTime.toMillis()));
+      await updateDoc(teamRef, { endTime: serverTimestamp(), elapsed });
+      saveEl && (saveEl.textContent = "記録を保存しました。");
+    } else { saveEl && (saveEl.textContent = ""); }
+
+    timeEl && (timeEl.textContent = elapsed ? fmt(elapsed) : "記録なし");
     setButtonsComplete();
     renderVerifyQR({ uid });
   } catch (e) {
     console.error(e);
-    timeEl.textContent = "エラーが発生しました。通信状況をご確認ください。";
+    timeEl && (timeEl.textContent = "エラーが発生しました。通信状況をご確認ください。");
     setButtonsIncomplete();
   }
 }

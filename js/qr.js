@@ -1,9 +1,17 @@
-const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fistkk71.github.io"];
-if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
+const CANON_ORIGIN = "https://fistkk71.github.io";
+const CANON_BASE   = "/pre_festival/";
+if (location.origin !== CANON_ORIGIN || !location.pathname.startsWith(CANON_BASE)) {
+  location.replace(CANON_ORIGIN + CANON_BASE);
+}
+
+
 
 import { db, ensureAuthed } from "./firebase-init.js";
 import { doc, getDoc, setDoc, collection, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+// ==========================
+// ユーティリティ
+// ==========================
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const fmt = (ms) => {
   const t = Math.max(0, Math.floor(ms / 1000));
@@ -13,6 +21,9 @@ const fmt = (ms) => {
   return h > 0 ? `${h}時間${m}分${s}秒` : `${m}分${s}秒`;
 };
 
+// ==========================
+// トークンテーブル（新旧対応）
+// ==========================
 const TOKEN_TABLE = Object.freeze({
   // —— ゴール（2地点） ——
   TH_GOAL_GRAND: "qr1", // グランエミオ所沢
@@ -21,13 +32,21 @@ const TOKEN_TABLE = Object.freeze({
   // —— スタート受付（エミテラス） ——
   TH_GATE_EMI: "gate-emi",
 
+  // 旧（必要なら片方だけ残す）
   G7fS9LzA: "qr1",
   T9nDv4We: "qr2",
 });
 
-const GOAL_IDS = new Set(["qr1", "qr2"]);
-const TOTAL_GOALS_TO_CLEAR = 1;
+// ==========================
+// 仕様定義（今回の一筆書きルール）
+// ==========================
+const GOAL_IDS = new Set(["qr1","qr2"]);
+const TOTAL_GOALS_TO_CLEAR = 1; // 1個見つけたら終了
 
+// （任意）受付の有効期間を付けたい場合は有効化
+// 例：同日内のみOK等の運用に
+const USE_GATE_STALE_CHECK = false;
+const GATE_STALE_LIMIT_MS = 1000 * 60 * 60 * 8; // 8時間（必要なら変更）
 
 async function init() {
   // ===== メタ（qr.html内template 未変更でも動くが、可能なら data-total="1" に） =====
@@ -39,7 +58,7 @@ async function init() {
   // ===== 対象QR（表示用の名称辞書） =====
   // type: "goal" | "gate" を付けて役割を明示（HUD集計の判定に使う）
   const POINTS = [
-    { id: "qr1", name: "グランエミオ所沢", type: "goal" },
+        { id: "qr1", name: "グランエミオ所沢", type: "goal" },
     { id: "qr2", name: "シティタワー所沢クラッシィ", type: "goal" },
   ];
 
@@ -72,10 +91,8 @@ async function init() {
     localStorage.setItem("uid", "test");
   }
   if (!uid) {
-    titleEl.textContent = "まだ受付が済んでいません。";
-    placeEl.textContent = "エミテラスにて受付を行なっています（参加用QRがあります）。そちらへ向かってください。";
-    setPrimaryCTA("受付が必要です", null, { disabled: true });
-    document.getElementById("secondaryCtaAnchor")?.replaceChildren();
+    alert("参加情報が見つかりません。受付からやり直してください。");
+    location.href = "register.html";
     return;
   }
 
@@ -93,18 +110,36 @@ async function init() {
     return; // 以降の処理を行わない
   }
 
-  // —— ゴール系QR（qr1/qr2）を読み取った場合：受付済みチェック ——
+    // —— ゴール系QR（qr1/qr2）を読み取った場合：受付通過チェック ——
   if (GOAL_IDS.has(point.id)) {
-    const ok = await ensureRegistered(uid);
-    if (!ok) {
-      titleEl.textContent = "まだ受付が済んでいません。";
-      placeEl.textContent = "エミテラスにて受付を行なっています（参加用QRがあります）。そちらへ向かってください。";
-      setPrimaryCTA("受付が必要です", null, { disabled: true });
-      document.getElementById("secondaryCtaAnchor")?.replaceChildren();
+    const gateOK = await ensureGateBeforeGoal(uid);
+    if (!gateOK) {
+      titleEl.textContent = "まだスタートしていません";
+      placeEl.textContent =
+        "まずは『エミテラス所沢（スタート）』のQRを読み取ってから、ゴール地点へ向かってください。";
+
+      // 地図へ誘導する大きなCTA
+      setPrimaryCTA("スタート地点（エミテラス）へ", () => {
+        // 可能なら地図側で #emi または ?focus=emi を解釈してマーカーをハイライト
+        location.href = "map.html?focus=emi&hint=start";
+      }, { className: "btn btn-primary w-full text-lg" });
+
+      // 説明的なボタン（任意で2ndCTAを用意したい場合）
+      createSecondaryCTA(
+        "今のQRを保存しておく",
+        async () => {
+          // 不正クリアを避けるため、ここではゴール記録はしない
+          alert(
+            "スタート後にもう一度このQRを読み取ればクリアできます（途中保存は不要です）。"
+          );
+        },
+        { className: "btn btn-ghost mt-2" }
+      );
+
+      // ゴール処理はここで中断（ゲーム起動させない）
       return;
     }
   }
-
 
   // —— ここまで来たら、通常のゴールフローに乗せる ——
   titleEl.textContent = "お宝のQRを発見！";
@@ -119,6 +154,7 @@ async function init() {
   // ==========================
   async function updateHUD() {
     try {
+      // ゴール（qr1/qr2）だけを集計
       const count = await getGoalCount(uid);
       foundCountEl && (foundCountEl.textContent = String(count));
       remainCountEl && (remainCountEl.textContent = String(Math.max(TOTAL - count, 0)));
@@ -228,17 +264,17 @@ async function init() {
       const finish = async () => {
         try {
           if (document.fullscreenElement) await document.exitFullscreen();
-        } catch { }
+        } catch {}
         overlay.remove();
         resolve();
       };
       video.addEventListener("ended", finish, { once: true });
-      video.play().catch(() => { });
+      video.play().catch(() => {});
       try {
         const p = overlay.requestFullscreen?.() || video.requestFullscreen?.();
         if (p && typeof p.then === "function") await p;
         video.muted = false;
-      } catch { }
+      } catch {}
     });
   }
 
@@ -253,7 +289,7 @@ async function init() {
       const s = new Set(JSON.parse(localStorage.getItem("found") || "[]"));
       s.add(pointId);
       localStorage.setItem("found", JSON.stringify([...s]));
-    } catch { }
+    } catch {}
   }
 
   async function getGoalCount(uid) {
@@ -267,24 +303,24 @@ async function init() {
 
 
 
-  async function ensureRegistered(uid) {
-    try {
-      const ref = doc(db, "teams", uid);
-      const snap = await getDoc(ref);
-      if (!snap.exists()) return false; // チームドキュメントがない
-      const d = snap.data() || {};
-      // 登録完了の目印：teamName が文字列、members が1以上、startTime が存在（運用に合わせて調整可）
-      if (typeof d.teamName !== "string" || !d.teamName.trim()) return false;
-      if (typeof d.members !== "number" || !(d.members > 0)) return false;
-      if (!d.startTime) return false;
-      return true;
-    } catch (e) {
-      console.warn("ensureRegistered failed:", e);
-      return false; // エラー時は安全側で未登録と扱う
-    }
+async function ensureRegistered(uid) {
+  try {
+    const ref = doc(db, "teams", uid);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return false; // チームドキュメントがない
+    const d = snap.data() || {};
+    // 登録完了の目印：teamName が文字列、members が1以上、startTime が存在（運用に合わせて調整可）
+    if (typeof d.teamName !== "string" || !d.teamName.trim()) return false;
+    if (typeof d.members !== "number" || !(d.members > 0)) return false;
+    if (!d.startTime) return false;
+    return true;
+  } catch (e) {
+    console.warn("ensureRegistered failed:", e);
+    return false; // エラー時は安全側で未登録と扱う
   }
+}
 
-  async function runAfterGame() {
+async function runAfterGame() {
     await playRewardFull();
     try {
       if (key) await recordPointIfNeeded(uid, key);
