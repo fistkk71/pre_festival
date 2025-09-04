@@ -1,9 +1,3 @@
-const CANON_ORIGIN = "https://fistkk71.github.io";
-const CANON_BASE   = "/pre_festival/";
-if (location.origin !== CANON_ORIGIN || !location.pathname.startsWith(CANON_BASE)) {
-  location.replace(CANON_ORIGIN + CANON_BASE);
-}
-
 "use strict";
 
 /* ---------- DOM ---------- */
