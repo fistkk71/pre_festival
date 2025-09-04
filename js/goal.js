@@ -1,4 +1,4 @@
-const GOAL_IDS = new Set(["qr1","qr2"]);
+const GOAL_IDS = new Set(["qr1", "qr2"]);
 const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fistkk71.github.io"]; if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
 
 import { db, ensureAuthed } from "./firebase-init.js";
@@ -29,7 +29,7 @@ function setButtonsComplete() {
   homeBtn && (homeBtn.textContent = "トップへ戻る", homeBtn.onclick = () => { localStorage.removeItem("uid"); location.href = "index.html"; });
 }
 async function renderVerifyQR({ uid }) {
-  const url = `${location.origin}/verify.html?uid=${encodeURIComponent(uid)}`;
+  const url = new URL("verify.html?uid=" + encodeURIComponent(uid), location.href).href;
   const wrap = document.querySelector(".qr-wrap") || document.body;
   const canvas = document.getElementById("goalQr") || document.getElementById("couponQR");
   const link = document.getElementById("verifyUrl");
@@ -83,11 +83,18 @@ async function finalize() {
     if (!elapsed && startTime) {
       const startMs = startTime.toMillis();
       elapsed = Date.now() - startMs;
-      await updateDoc(teamRef, { endTime: serverTimestamp(), elapsed });
-      saveEl.textContent = "記録を保存しました。";
-    } else { saveEl.textContent = ""; }
-
-    timeEl.textContent = elapsed ? fmt(elapsed) : "記録なし";
+      timeEl.textContent = fmt(elapsed);
+      try {
+        await updateDoc(teamRef, { endTime: serverTimestamp(), elapsed });
+        saveEl.textContent = "記録を保存しました。";
+      } catch (e) {
+        console.error(e);
+        saveEl.textContent = "保存できませんでした";
+      }
+    } else {
+      timeEl.textContent = elapsed ? fmt(elapsed) : "記録なし";
+      saveEl.textContent = "";
+    }
     setButtonsComplete();
     renderVerifyQR({ uid });
   } catch (e) {
