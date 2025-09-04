@@ -1,3 +1,4 @@
+const GOAL_IDS = new Set(["qr1","qr2"]);
 const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fistkk71.github.io"]; if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
 
 import { db, ensureAuthed } from "./firebase-init.js";

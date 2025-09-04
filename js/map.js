@@ -253,7 +253,7 @@ function redrawCircles() {
   circlesById.clear();
 
   const points = Array.isArray(cfg.qrPoints) ? cfg.qrPoints : [];
-  const EXCLUDE_IDS = new Set(["qr2", "EMITERACE", "emiterace", "emi"]);
+  const EXCLUDE_IDS = new Set([ "EMITERACE", "emiterace", "emi"]);
 
   for (const p of points) {
     if (!p?.id || !Number.isFinite(p.lat) || !Number.isFinite(p.lng)) continue;

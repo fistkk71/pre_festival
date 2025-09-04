@@ -1,3 +1,4 @@
+const GOAL_IDS = new Set(["qr1","qr2"]);
 import { db, ensureAuthed } from "./firebase-init.js";
 import { doc, getDoc, updateDoc, serverTimestamp, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
