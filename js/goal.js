@@ -29,26 +29,36 @@ function setButtonsComplete() {
   homeBtn && (homeBtn.textContent = "トップへ戻る", homeBtn.onclick = () => { localStorage.removeItem("uid"); location.href = "index.html"; });
 }
 
+async function ensureQRCodeLib() {
+  if (globalThis.QRCode) return globalThis.QRCode;
+  try {
+    const mod = await import('https://esm.sh/qrcode@1.5.3');
+    const QR = mod?.default ?? mod;
+    globalThis.QRCode = QR;
+    return QR;
+  } catch (e) {
+    console.warn('[QR] library load failed; will use image fallback', e);
+    return null;
+  }
+}
+
 let QR_RENDERED = false;
 async function renderVerifyQR({ uid }) {
   if (QR_RENDERED) return;
   QR_RENDERED = true;
   const url = new URL(`./verify.html?uid=${encodeURIComponent(uid)}`, location.href).toString();
-  const wrap = document.querySelector(".qr-wrap") || document.body;
-  if (wrap) wrap.replaceChildren();
-  const canvas = document.getElementById("goalQr") || document.getElementById("couponQR");
-  const link = document.getElementById("verifyUrl");
-
+  const canvas = document.getElementById("goalQr");
+  const wrap = canvas?.parentElement || document.querySelector(".proof__wrap") || document.body;
   try {
-    if (window.QRCode?.toCanvas && canvas) {
-      await window.QRCode.toCanvas(canvas, url, { width: 256, margin: 1 });
-    } else if (typeof window.QRCode === "function") {
-      if (canvas) canvas.remove();
-      wrap.innerHTML = "";
-      new window.QRCode(wrap, { text: url, width: 256, height: 256, correctLevel: window.QRCode.CorrectLevel?.M || 1 });
+    const QR = await ensureQRCodeLib();
+    if (QR?.toCanvas && canvas) {
+      const ctx = canvas.getContext?.("2d");
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+      await QR.toCanvas(canvas, url, { width: 256, margin: 1 });
     } else {
       const img = document.createElement("img");
-      img.alt = "QR"; img.width = 256; img.height = 256;
+      img.alt = "QR";
+      img.width = 256; img.height = 256;
       img.src = "https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=" + encodeURIComponent(url);
       if (canvas) canvas.replaceWith(img); else wrap.appendChild(img);
     }
@@ -57,7 +67,6 @@ async function renderVerifyQR({ uid }) {
 }
 
 async function finalize() {
-  if (uid) renderVerifyQR({ uid });
   await ensureAuthed();
   if (!uid) { timeEl.textContent = "参加情報（UID）が見つかりません。受付からやり直してください。"; setButtonsIncomplete(); return; }
   try {
@@ -93,7 +102,7 @@ async function finalize() {
 
     timeEl.textContent = elapsed ? fmt(elapsed) : "記録なし";
     setButtonsComplete();
-    renderVerifyQR({ uid });
+    renderVerifyQR(uid);
   } catch (e) {
     console.error(e);
     timeEl.textContent = "エラーが発生しました。通信状況をご確認ください。";
