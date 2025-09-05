@@ -320,7 +320,13 @@ function showMovie(src) {
   const layer = document.getElementById("movieLayer");
   const v = document.getElementById("moviePlayer");
   if (!v) return;
-  v.src = src; v.currentTime = 0; v.play().catch(() => { /* 自動再生が阻害された場合はユーザーに任せる */ });
   layer.style.display = "grid";
+  v.src = src;
+  v.currentTime = 0;
+  try {
+    const p = layer.requestFullscreen?.() || v.requestFullscreen?.();
+    if (p && typeof p.then === "function") { p.catch(() => { }); }
+  } catch { }
+  v.play().catch(() => { });
 }
 
