@@ -49,6 +49,7 @@ async function renderVerifyQR({ uid }) {
   const url = new URL(`./verify.html?uid=${encodeURIComponent(uid)}`, location.href).toString();
   const canvas = document.getElementById("goalQr");
   const wrap = canvas?.parentElement || document.querySelector(".proof__wrap") || document.body;
+  const link   = document.getElementById("verifyUrl");
   try {
     const QR = await ensureQRCodeLib();
     if (QR?.toCanvas && canvas) {
