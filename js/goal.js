@@ -69,8 +69,7 @@ async function finalize() {
 
     teamEl.textContent = teamName;
     memEl.textContent = String(members);
-    treEl.textContent = `${found} / ${REQUIRED}`;
-
+    if (treEl) treEl.textContent = `${found} / ${REQUIRED}`;
     if (found < REQUIRED) {
       timeEl.textContent = "まだゴール条件を満たしていません。";
       saveEl.textContent = "City または Grand のどちらか1箇所でクリアしてください。";
