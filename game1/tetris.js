@@ -8,7 +8,7 @@ const PARAMS = new URLSearchParams(location.search);
 const TARGET_LINES = Number(PARAMS.get("target") || 7); //ここでライン設定(変更する場合はHTMLも対応)
 const DROP_MS = Number(PARAMS.get("speed") || 500);
 const SOFT_MS = Number(PARAMS.get("soft") || 30);
-let EXTRA_BOTTOM_PX = Number(PARAMS.get("bottom") || 150);
+let EXTRA_BOTTOM_PX = Number(PARAMS.get("bottom") || 200);
 
 // ---- 形状・色 ----
 const SHAPES = {
