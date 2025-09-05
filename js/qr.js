@@ -10,6 +10,12 @@ const fmt = (ms) => {
   return h > 0 ? `${h}時間${m}分${s}秒` : `${m}分${s}秒`;
 };
 
+function yyyymmddJST() {
+  const p = new Intl.DateTimeFormat("ja-JP", { timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit" })
+    .formatToParts(new Date());
+  return `${p.find(x => x.type === "year").value}${p.find(x => x.type === "month").value}${p.find(x => x.type === "day").value}`;
+}
+
 const TOKEN_TABLE = Object.freeze({
   "TH-GOAL-GRAND": "qr1", // グランエミオ所沢
   "TH-GOAL-CITY": "qr2", // シティタワー所沢クラッシィ
@@ -51,10 +57,32 @@ async function init() {
   if (qsUid) localStorage.setItem("uid", qsUid);
   let uid = localStorage.getItem("uid");
   if (!uid && TEST_MODE) { uid = "test"; localStorage.setItem("uid", "test"); }
-  if (!uid) {
+  if (!uid) { showRegisterOverlay(); return; }
+
+  try {
+    const teamSnap = await getDoc(doc(db, "teams", uid));
+    const team = teamSnap.exists() ? teamSnap.data() : null;
+    const today = (() => {
+      const p = new Intl.DateTimeFormat("ja-JP", { timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
+      return `${p.find(x => x.type === "year").value}${p.find(x => x.type === "month").value}${p.find(x => x.type === "day").value}`;
+    })();
+    if (!team || team.playDay !== today) {
+      localStorage.removeItem("uid");
+      showRegisterOverlay();
+      return;
+    }
+    if (team.redeemedAt) {
+      titleEl && (titleEl.textContent = "本日の参加は終了しました");
+      placeEl && (placeEl.textContent = "受付にて引換済みです。");
+      setPrimaryCTA("トップへ戻る", () => location.href = "index.html");
+      return;
+    }
+  } catch {
+    localStorage.removeItem("uid");
     showRegisterOverlay();
     return;
   }
+
   // ===== 地点判定 =====
   const rawKey = (qs.get("key") || qs.get("k") || qs.get("id") || "").toLowerCase();
   const token = qs.get("token") || qs.get("t") || "";
@@ -189,7 +217,7 @@ async function init() {
   }
 
   async function runAfterGame() {
-    await playRewardFull();
+    showMovie(VIDEO_SRC);
     try {
       if (key) await recordTreasureIfNeeded(key);
       await updateHUD();
@@ -254,3 +282,29 @@ if (document.readyState === "loading") {
 } else {
   init().catch(console.error);
 }
+
+function ensureMovieLayer() {
+  if (document.getElementById("movieLayer")) return;
+  const layer = document.createElement("div");
+  layer.id = "movieLayer";
+  Object.assign(layer.style, { position: "fixed", inset: 0, background: "rgba(0,0,0,.8)", display: "grid", placeItems: "center", zIndex: 5000, padding: "16px" });
+  layer.innerHTML = `
+    <div style="width:min(920px,96%); background:#000; border-radius:12px; padding:12px; box-shadow:0 20px 60px rgba(0,0,0,.5);">
+      <video id="moviePlayer" style="width:100%; height:auto; display:block; background:#000;" playsinline controls></video>
+      <div style="display:flex; gap:8px; justify-content:center; margin-top:8px;">
+        <button id="mvClose" class="btn-secondary">閉じる</button>
+      </div>
+    </div>`;
+  document.body.appendChild(layer);
+  document.getElementById("mvClose")?.addEventListener("click", () => { layer.style.display = "none"; const v = document.getElementById("moviePlayer"); v && (v.pause(), v.removeAttribute("src"), v.load()); });
+}
+
+function showMovie(src) {
+  ensureMovieLayer();
+  const layer = document.getElementById("movieLayer");
+  const v = document.getElementById("moviePlayer");
+  if (!v) return;
+  v.src = src; v.currentTime = 0; v.play().catch(() => { /* 自動再生が阻害された場合はユーザーに任せる */ });
+  layer.style.display = "grid";
+}
+

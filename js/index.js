@@ -6,6 +6,12 @@ import {
   doc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+function yyyymmddJST() {
+  const p = new Intl.DateTimeFormat("ja-JP", { timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit", day: "2-digit" })
+    .formatToParts(new Date());
+  return `${p.find(x => x.type === "year").value}${p.find(x => x.type === "month").value}${p.find(x => x.type === "day").value}`;
+}
+
 /* ---------- ナビ開閉（全ページ共通パターン） ---------- */
 const navToggle = document.getElementById("nav-toggle");
 const mainMenu = document.getElementById("main-menu");
@@ -71,4 +77,26 @@ if (leaderboardRoot) {
     }
   } catch (_) {
   }
+})();
+
+(async () => {
+  try {
+    const uid = localStorage.getItem("uid");
+    if (!uid) return;
+
+    const team = (await getDoc(doc(db, "teams", uid))).data();
+    if (!team) return;
+
+    const today = yyyymmddJST();
+    if (team.playDay === today && team.redeemedAt) {
+      const a = document.querySelector('.hero-content a[href$="register.html"]'); if (a) {
+        a.setAttribute("aria-disabled", "true");
+        a.classList.add("btn-disabled");
+        a.onclick = (e) => e.preventDefault();
+        a.textContent = "本日の参加は終了しました";
+      }
+      const hero = document.querySelector(".hero-content p");
+      if (hero) hero.textContent = "1日1回の参加となります";
+    }
+  } catch (_) { }
 })();

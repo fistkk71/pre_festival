@@ -23,13 +23,19 @@ function setButtonsIncomplete() {
   rankBtn && (rankBtn.textContent = "マップへ戻る", rankBtn.classList.remove("primary"), rankBtn.classList.add("secondary"), rankBtn.onclick = () => location.href = "map.html");
   homeBtn && (homeBtn.textContent = "トップへ戻る", homeBtn.onclick = () => location.href = "index.html");
 }
+
 function setButtonsComplete() {
   rankBtn && (rankBtn.textContent = "ランキングを見る", rankBtn.classList.add("primary"), rankBtn.onclick = () => { localStorage.removeItem("uid"); location.href = "index.html"; });
   homeBtn && (homeBtn.textContent = "トップへ戻る", homeBtn.onclick = () => { localStorage.removeItem("uid"); location.href = "index.html"; });
 }
+
+let QR_RENDERED = false;
 async function renderVerifyQR({ uid }) {
+  if (QR_RENDERED) return;
+  QR_RENDERED = true;
   const url = new URL(`./verify.html?uid=${encodeURIComponent(uid)}`, location.href).toString();
   const wrap = document.querySelector(".qr-wrap") || document.body;
+  if (wrap) wrap.replaceChildren();
   const canvas = document.getElementById("goalQr") || document.getElementById("couponQR");
   const link = document.getElementById("verifyUrl");
 
