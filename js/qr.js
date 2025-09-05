@@ -82,6 +82,28 @@ async function init() {
     return;
   }
 
+  if (key) {
+    const pointRef = doc(db, "teams", uid, "points", key);
+    const doneSnap = await getDoc(pointRef);
+    if (doneSnap.exists()) {
+      await updateHUD();
+      const count = (await getDocs(collection(db, "teams", uid, "points"))).size;
+
+      titleEl && (titleEl.textContent = "このスポットはクリア済みです");
+      placeEl && (placeEl.textContent = "次のスポットへお進みください。");
+
+      if (count >= TOTAL) {
+        goalNote?.classList.remove("hidden");
+        setPrimaryCTA("クーポン券を受け取る", () => {
+          location.href = `goal.html?uid=${encodeURIComponent(uid)}`;
+        });
+      } else {
+        setPrimaryCTA("次のお宝を探す", () => { location.href = "map.html"; });
+      }
+      return;
+    }
+  }
+
   async function updateHUD() {
     try {
       const pointsSnap = await getDocs(collection(db, "teams", uid, "points"));
@@ -220,10 +242,6 @@ function showRegisterOverlay() {
       このQRは<span style="font-weight:700;">参加登録後</span>に挑戦できます。<br>
       先にエミテラス受付で参加登録をお願いします。
     </p>
-    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
-      <a href="register.html" class="btn-start btn--wide">受付で登録する</a>
-      <a href="index.html" class="btn-secondary">トップへ戻る</a>
-    </div>
   `;
 
   overlay.appendChild(card);
