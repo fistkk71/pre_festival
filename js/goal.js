@@ -28,7 +28,7 @@ function setButtonsComplete() {
   homeBtn && (homeBtn.textContent = "トップへ戻る", homeBtn.onclick = () => { localStorage.removeItem("uid"); location.href = "index.html"; });
 }
 async function renderVerifyQR({ uid }) {
-  const url = `${location.origin}/verify.html?uid=${encodeURIComponent(uid)}`;
+  const url = new URL(`./verify.html?uid=${encodeURIComponent(uid)}`, location.href).toString();
   const wrap = document.querySelector(".qr-wrap") || document.body;
   const canvas = document.getElementById("goalQr") || document.getElementById("couponQR");
   const link = document.getElementById("verifyUrl");

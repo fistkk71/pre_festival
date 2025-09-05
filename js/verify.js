@@ -14,6 +14,7 @@ const noteEl = document.getElementById("note");
 const PASS = "tokorozawa";
 const gateEl = document.getElementById("pwGate");
 const mainEl = document.getElementById("main");
+const layerEl = document.getElementById("pwLayer");
 const pwInput = document.getElementById("pwInput");
 const pwBtn = document.getElementById("pwBtn");
 const pwMsg = document.getElementById("pwMsg");
@@ -101,7 +102,8 @@ function unlock() {
   const exp = Date.now() + VERIFY_TTL_MS;
   localStorage.setItem(VERIFY_KEY, "1");
   localStorage.setItem(VERIFY_EXP, String(exp));
-  if (gateEl) gateEl.style.display = "none";
+  if (layerEl) layerEl.hidden = true;
+  else if (gateEl) gateEl.style.display = "none";
   if (mainEl) mainEl.hidden = false;
   main();
 }
@@ -111,12 +113,13 @@ function boot() {
   const exp = Number(localStorage.getItem(VERIFY_EXP) || 0);
   if (ok && exp > Date.now()) {
     localStorage.setItem(VERIFY_EXP, String(Date.now() + VERIFY_TTL_MS));
-    if (gateEl) gateEl.style.display = "none";
+    if (layerEl) layerEl.hidden = true;
+    else if (gateEl) gateEl.style.display = "none";
     if (mainEl) mainEl.hidden = false;
     main();
     return;
   }
-  if (gateEl) gateEl.style.display = "";
+  if (layerEl) layerEl.hidden = false;
   if (mainEl) mainEl.hidden = true;
   const tryAuth = () => {
     const ok = (pwInput?.value || "").trim() === PASS;
