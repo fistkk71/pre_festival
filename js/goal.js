@@ -103,7 +103,7 @@ async function finalize() {
 
     timeEl.textContent = elapsed ? fmt(elapsed) : "記録なし";
     setButtonsComplete();
-    renderVerifyQR(uid);
+    renderVerifyQR({uid});
   } catch (e) {
     console.error(e);
     timeEl.textContent = "エラーが発生しました。通信状況をご確認ください。";
