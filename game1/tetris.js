@@ -8,7 +8,7 @@ const PARAMS = new URLSearchParams(location.search);
 const TARGET_LINES = Number(PARAMS.get("target") || 7); //ここでライン設定(変更する場合はHTMLも対応)
 const DROP_MS = Number(PARAMS.get("speed") || 500);
 const SOFT_MS = Number(PARAMS.get("soft") || 30);
-let EXTRA_BOTTOM_PX = Number(PARAMS.get("bottom") || 200);
+let EXTRA_BOTTOM_PX = Number(PARAMS.get("bottom") || 150);
 
 // ---- 形状・色 ----
 const SHAPES = {
@@ -245,7 +245,7 @@ function fitCanvasToViewport() {
   const canvas = document.getElementById("board");
   const controlsH = document.getElementById("touchControls")?.offsetHeight || 0;
   const goalbarH = document.getElementById("goalbar")?.offsetHeight || 0;
-  const EXTRA_BOTTOM = 50;
+  const EXTRA_BOTTOM = 150;
   document.documentElement.style.setProperty("--extra-bottom", EXTRA_BOTTOM + "px");
   const vw = window.visualViewport?.width ?? window.innerWidth;
   const vvh = window.visualViewport?.height ?? window.innerHeight;
