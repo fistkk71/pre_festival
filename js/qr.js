@@ -73,6 +73,15 @@ async function init() {
 
   updateHUD();
 
+  const teamSnap = await getDoc(doc(db, "teams", uid));
+  const team = teamSnap.data();
+  if (team?.redeemedAt) {
+    titleEl.textContent = "このチームは引き換え済みです";
+    placeEl.textContent = "ゲームは終了しています。";
+    setPrimaryCTA("引き換え済み", null, { disabled: true });
+    return;
+  }
+
   async function updateHUD() {
     try {
       const pointsSnap = await getDocs(collection(db, "teams", uid, "points"));
@@ -102,7 +111,7 @@ async function init() {
     return btn;
   }
 
-  function playTetrisInOverlay(targetLines = 10) {
+  function playTetrisInOverlay(targetLines = 7) {
     return new Promise((resolve) => {
       const overlay = document.createElement("div");
       Object.assign(overlay.style, { position: "fixed", inset: "0", background: "#000", display: "grid", placeItems: "center", zIndex: "4000" });
