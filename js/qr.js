@@ -208,18 +208,34 @@ async function init() {
   async function recordTreasureIfNeeded(pointId) {
     const ref = doc(db, "teams", uid, "points", pointId);
     const snap = await getDoc(ref);
-    if (!snap.exists()) await setDoc(ref, { foundAt: serverTimestamp() });
+    if (!snap.exists()) {
+      try {
+        await setDoc(ref, { foundAt: serverTimestamp() });
+      } catch (e) {
+        console.error("ポイント保存失敗:", e);
+        if (e?.code === "permission-denied") {
+          titleEl && (titleEl.textContent = "登録した端末で読み取ってください");
+          placeEl && (placeEl.textContent = "受付で登録したスマホ（同じブラウザ）をご使用ください。");
+          setPrimaryCTA("トップへ戻る", () => location.href = "index.html");
+        } else {
+          setPrimaryCTA("通信エラーでもう一度", () => runFlow());
+        }
+        return false;
+      }
+    }
     try {
       window.markTreasureFound?.(pointId);
       const s = new Set(JSON.parse(localStorage.getItem("found") || "[]"));
       s.add(pointId); localStorage.setItem("found", JSON.stringify([...s]));
     } catch { }
+    return true;
   }
 
   async function runAfterGame() {
     showMovie(VIDEO_SRC);
     try {
-      if (key) await recordTreasureIfNeeded(key);
+      const ok = key ? await recordTreasureIfNeeded(key) : true;
+      if (!ok) return;
       await updateHUD();
       const count = (await getDocs(collection(db, "teams", uid, "points"))).size;
       if (count >= TOTAL) {
