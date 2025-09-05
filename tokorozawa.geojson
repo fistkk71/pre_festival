@@ -78,7 +78,7 @@
     {
       "type": "Feature",
       "properties": {
-        "id": "qr2",
+        "id": "",
         "name": "エミテラス所沢",
         "type": "building",
         "stroke": "#6d4c41",
@@ -180,7 +180,7 @@
     {
       "type": "Feature",
       "properties": {
-        "id": "qr3",
+        "id": "qr2",
         "name": "シティタワー所沢クラッシィ",
         "type": "building",
         "stroke": "#6d4c41",

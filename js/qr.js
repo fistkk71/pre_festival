@@ -10,15 +10,12 @@ const fmt = (ms) => {
   return h > 0 ? `${h}時間${m}分${s}秒` : `${m}分${s}秒`;
 };
 
-// —— 新トークン（例）＋旧トークン互換 ——
-// 既存の印刷物があれば、ここに追加で対応可
 const TOKEN_TABLE = Object.freeze({
-  // 新
   "TH-GOAL-GRAND": "qr1", // グランエミオ所沢
-  "TH-GOAL-CITY": "qr3", // シティタワー所沢クラッシィ
+  "TH-GOAL-CITY": "qr2", // シティタワー所沢クラッシィ
   // 旧（必要なら片方だけ残す）
   "G7fS9LzA": "qr1",
-  "T9nDv4We": "qr3"
+  "T9nDv4We": "qr2"
 });
 
 async function init() {
@@ -27,10 +24,9 @@ async function init() {
   const META = metaEl?.dataset || {};
   const TOTAL = 1; // ← 強制 1 個で終了
   const VIDEO_SRC = META.video || "./image/treasure.mp4";
-  // 2地点のみを対象に（id は既存の map 側想定に合わせて qr1/qr3 を採用）
   const POINTS = [
     { "id": "qr1", "name": "グランエミオ所沢" },
-    { "id": "qr3", "name": "シティタワー所沢クラッシィ" }
+    { "id": "qr2", "name": "シティタワー所沢クラッシィ" }
   ];
 
   // ===== HUD =====
@@ -55,8 +51,10 @@ async function init() {
   if (qsUid) localStorage.setItem("uid", qsUid);
   let uid = localStorage.getItem("uid");
   if (!uid && TEST_MODE) { uid = "test"; localStorage.setItem("uid", "test"); }
-  if (!uid) { alert("参加情報が見つかりません。受付からやり直してください。"); location.href = "register.html"; return; }
-
+  if (!uid) {
+    showRegisterOverlay();
+    return;
+  }
   // ===== 地点判定 =====
   const rawKey = (qs.get("key") || qs.get("k") || qs.get("id") || "").toLowerCase();
   const token = qs.get("token") || qs.get("t") || "";
@@ -181,12 +179,47 @@ async function init() {
     if (!key || !point) return;
     setPrimaryCTA("ゲーム起動中…", null, { disabled: true });
     let cleared = false;
-    if (key === "qr1") cleared = await playTetrisInOverlay(10);
-    else if (key === "qr3") cleared = await playDummyCountdown();
-    else cleared = true;
+    const TARGET_BY_POINT = { qr1: 7, qr2: 7 }; // ← 目標ライン数。必要なら値を変えてOK
+    const targetLines = TARGET_BY_POINT[key] ?? 7;
+    if (key === "qr1" || key === "qr2") {
+      cleared = await playTetrisInOverlay(targetLines);
+    } else {
+      cleared = true;
+    }
     if (!cleared) { setPrimaryCTA("再チャレンジしますか？", runFlow); return; }
     await runAfterGame();
   }
+}
+
+function showRegisterOverlay() {
+  const overlay = document.createElement("div");
+  Object.assign(overlay.style, {
+    position: "fixed", inset: "0", zIndex: "5000",
+    background: "rgba(0,0,0,.85)", display: "grid", placeItems: "center", padding: "24px"
+  });
+
+  const card = document.createElement("div");
+  Object.assign(card.style, {
+    width: "min(720px, 96%)", background: "#fff", color: "#222",
+    borderRadius: "16px", padding: "24px", textAlign: "center",
+    boxShadow: "0 14px 40px rgba(0,0,0,.25)"
+  });
+
+  card.innerHTML = `
+    <h2 style="margin:.2rem 0 .6rem; font-size:1.4rem;">まずはエミテラスの受付へ</h2>
+    <p style="margin:0 0 1rem; line-height:1.7;">
+      このQRは<span style="font-weight:700;">参加登録後</span>に挑戦できます。<br>
+      先にエミテラス受付で参加登録をお願いします。
+    </p>
+    <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+      <a href="register.html" class="btn-start btn--wide">受付で登録する</a>
+      <a href="index.html" class="btn-secondary">トップへ戻る</a>
+    </div>
+  `;
+
+  overlay.appendChild(card);
+  document.body.appendChild(overlay);
+  try { document.body.style.overflow = "hidden"; } catch { }
 }
 
 if (document.readyState === "loading") {

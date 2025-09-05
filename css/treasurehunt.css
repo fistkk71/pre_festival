@@ -1001,3 +1001,25 @@ body.scanner-open .footer {
   height: 100%;
   width: 100%
 }
+
+/* iOS Safe Area 対応 */
+:root {
+  --sat: env(safe-area-inset-top);
+  --sar: env(safe-area-inset-right);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+}
+
+.header {
+  padding-top: calc(12px + var(--sat));
+}
+
+.footer {
+  padding-bottom: calc(12px + var(--sab));
+}
+
+/* 全画面系キャンバス */
+.map-canvas,
+.scanner {
+  padding-bottom: var(--sab);
+}
