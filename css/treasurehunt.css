@@ -1092,3 +1092,111 @@ body.scanner-open .footer {
 .btn-ticket:active {
   transform: translateY(1px);
 }
+
+/* === Tutorial: スマホで横に長く読みやすく === */
+@media (max-width: 820px) {
+
+  .center-card.narrow {
+    max-width: 96%;
+    padding: 1.6rem 1rem;
+  }
+
+  .tutorial ol>li {
+    grid-template-columns: 1.55em 1fr;
+    gap: .55em;
+    padding: .75em .9em;
+  }
+
+  .tutorial ol>li::before {
+    inline-size: 1.55em;
+    block-size: 1.55em;
+    font-size: .9em;
+  }
+}
+
+@media (min-width: 821px) and (max-width: 1080px) {
+  .tutorial ol>li {
+    grid-template-columns: 1.7em 1fr;
+    gap: .6em;
+  }
+
+  .tutorial ol>li::before {
+    inline-size: 1.7em;
+    block-size: 1.7em;
+  }
+}
+
+/* === 景品コーナー === */
+.prize-lead{
+  font-weight: 700;
+  color: var(--accent);
+  margin: .2em 0 .6em;
+}
+
+.rewards{
+  display: grid;
+  gap: var(--gap);
+  grid-template-columns: 1fr;
+}
+@media (min-width: 560px){
+  .rewards{ grid-template-columns: 1fr 1fr; }
+}
+
+.reward-card{
+  background: var(--paper);
+  border: 1px solid #dce8df;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1rem 1.1rem;
+  display: grid;
+  gap: .5em;
+}
+
+.reward-card .place{
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: .01em;
+}
+
+.reward-line{
+  display: flex;
+  align-items: baseline;
+  gap: .6em;
+  flex-wrap: wrap;
+}
+
+.reward-line .badge{
+  display: inline-block;
+  padding: .2em .6em;
+  border-radius: 999px;
+  background: #e9f6ee;
+  color: var(--accent);
+  font-weight: 700;
+  font-size: .9em;
+  border: 1px solid #cfe8d7;
+}
+
+.reward-line .amount{
+  font-size: clamp(20px, 1.1rem + 2.4vw, 30px);
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.reward-card .note{
+  color: var(--muted);
+  font-size: .92em;
+  margin-top: .1em;
+}
+
+/* スマホで横長に読みやすく（番号カードの最適化も維持） */
+@media (max-width: 820px){
+  .center-card.narrow{ max-width: 96%; padding: 1.6rem 1rem; }
+  .tutorial ol > li{
+    grid-template-columns: 1.55em 1fr;
+    gap: .55em;
+    padding: .75em .9em;
+  }
+  .tutorial ol > li::before{
+    inline-size: 1.55em; block-size: 1.55em; font-size: .9em;
+  }
+}

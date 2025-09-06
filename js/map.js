@@ -1,5 +1,5 @@
 "use strict";
-
+const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "http://localhost:5500", "https://fistkk71.github.io"];
 /* ---------- DOM ---------- */
 const elMap = document.getElementById("map");
 const tpl = document.getElementById("map-config");
