@@ -16,14 +16,14 @@ const SFX = (() => {
   const LS_KEY = 'tetris_audio_v1';
 
   // 初期値（好みで変更可）
-  const state = { master: 0.001, bgm: 0.18, sfx: 0.45 };
+  const state = { master: 0.25, bgm: 0.18, sfx: 0.45 };
 
   try {
     const saved = JSON.parse(localStorage.getItem(LS_KEY));
     if (saved && typeof saved === 'object') Object.assign(state, saved);
-  } catch {}
+  } catch { }
 
-  const save = () => { try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch {} };
+  const save = () => { try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch { } };
 
   const makePool = (src, size = 6, base = 1.0) => {
     const pool = Array.from({ length: size }, () => {
@@ -37,13 +37,13 @@ const SFX = (() => {
       play() {
         const a = pool[idx];
         idx = (idx + 1) % pool.length;
-        try { a.currentTime = 0; a.play(); } catch {}
+        try { a.currentTime = 0; a.play(); } catch { }
       },
       updateVolume() {
         const v = base * state.sfx * state.master;
         pool.forEach(p => p.volume = v);
       },
-      stopAll() { pool.forEach(p => { try { p.pause(); p.currentTime = 0; } catch {} }); }
+      stopAll() { pool.forEach(p => { try { p.pause(); p.currentTime = 0; } catch { } }); }
     };
   };
 
@@ -53,22 +53,22 @@ const SFX = (() => {
   setBgmVol();
 
   const line = makePool("line_8bit.mp3", 8, 1.0);
-  const win  = makePool("win_8bit.mp3", 2, 1.0);
+  const win = makePool("win_8bit.mp3", 2, 1.0);
   const lose = makePool("lose_8bit.mp3", 2, 1.0);
 
   const updateAll = () => { setBgmVol(); line.updateVolume(); win.updateVolume(); lose.updateVolume(); };
 
   return {
-    startBGM() { try { bgm.currentTime = 0; bgm.play(); } catch (e) {} },
-    stopBGM()  { try { bgm.pause(); } catch (e) {} },
+    startBGM() { try { bgm.currentTime = 0; bgm.play(); } catch (e) { } },
+    stopBGM() { try { bgm.pause(); } catch (e) { } },
     line() { line.play(); },
-    win()  { this.stopBGM(); win.play(); },
+    win() { this.stopBGM(); win.play(); },
     lose() { this.stopBGM(); lose.play(); },
 
     setMasterVolume(v) { state.master = clamp(v); save(); updateAll(); },
-    setBgmVolume(v)    { state.bgm    = clamp(v); save(); updateAll(); },
-    setSfxVolume(v)    { state.sfx    = clamp(v); save(); updateAll(); },
-    getVolumes()       { return { ...state }; }
+    setBgmVolume(v) { state.bgm = clamp(v); save(); updateAll(); },
+    setSfxVolume(v) { state.sfx = clamp(v); save(); updateAll(); },
+    getVolumes() { return { ...state }; }
   };
 })();
 
@@ -465,6 +465,10 @@ window.addEventListener("load", () => {
   const startBtn = document.getElementById("startGame");
   const start = () => {
     splash.style.display = "none";
+    try { localStorage.removeItem('tetris_audio_v1'); } catch { }
+    SFX.setMasterVolume(0.28);
+    SFX.setBgmVolume(0.18);
+    SFX.setSfxVolume(0.45);
     window._tetris = new Tetris();
     SFX.startBGM();
   };
