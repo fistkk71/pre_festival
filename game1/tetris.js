@@ -36,9 +36,9 @@ const SFX = (() => {
   };
 
   const bgm = new Audio("tetris_8bit.mp3"); bgm.loop = true; bgm.preload = "auto"; bgm.volume = 1.0;
-  const line = makePool("line_8bit.mp3", 8, 1.0);
-  const win  = makePool("win_8bit.mp3", 2, 1.0);
-  const lose = makePool("lose_8bit.mp3", 2, 1.0);
+  const line = makePool("line_8bit.mp3", 8, .6);
+  const win  = makePool("win_8bit.mp3", 2, .6);
+  const lose = makePool("lose_8bit.mp3", 2, .6);
 
   return {
     startBGM() { try { bgm.currentTime = 0; bgm.play(); } catch (e) {} },
