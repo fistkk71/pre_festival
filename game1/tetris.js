@@ -8,7 +8,37 @@ const PARAMS = new URLSearchParams(location.search);
 const TARGET_LINES = Number(PARAMS.get("target") || 7); //ここでライン設定(変更する場合はHTMLも対応)
 const DROP_MS = Number(PARAMS.get("speed") || 500);
 const SOFT_MS = Number(PARAMS.get("soft") || 30);
-let EXTRA_BOTTOM_PX = Number(PARAMS.get("bottom") || 100);
+let EXTRA_BOTTOM_PX = Number(PARAMS.get("bottom") || 90);
+
+// ==== Audio ====
+const AudioMgr = (() => {
+  const bgm = new Audio("tetris_8bit.mp3"); bgm.loop = true; bgm.preload = "auto"; bgm.volume = 0.85;
+  const line = new Audio("line_8bit.mp3"); line.preload = "auto";
+  const win = new Audio("win_8bit.mp3"); win.preload = "auto";
+  const lose = new Audio("lose_8bit.mp3"); lose.preload = "auto";
+
+  let unlocked = false;
+  function unlock() {
+    if (unlocked) return; unlocked = true;
+    // iOS対策：ユーザー操作中に一度だけ無音で再生→停止
+    [bgm, line, win, lose].forEach(a => {
+      try {
+        a.muted = true;
+        const p = a.play();
+        if (p && typeof p.then === "function") {
+          p.then(() => { a.pause(); a.currentTime = 0; a.muted = false; }).catch(() => { a.muted = false; });
+        } else { a.pause(); a.currentTime = 0; a.muted = false; }
+      } catch { }
+    });
+  }
+  function startBGM() { unlock(); try { bgm.currentTime = 0; bgm.play(); } catch { } }
+  function stopBGM() { try { bgm.pause(); } catch { } }
+  function playLine() { try { line.currentTime = 0; line.play(); } catch { } }
+  function playWin() { stopBGM(); try { win.currentTime = 0; win.play(); } catch { } }
+  function playLose() { stopBGM(); try { lose.currentTime = 0; lose.play(); } catch { } }
+  return { startBGM, stopBGM, playLine, playWin, playLose, unlock };
+})();
+
 
 // ---- 形状・色 ----
 const SHAPES = {
@@ -130,6 +160,7 @@ class Tetris {
     this.prev = 0;
     this.next = this.randPiece();
     this.reset();
+    AudioMgr.startBGM();
     requestAnimationFrame(this.loop);
   }
 
@@ -163,6 +194,7 @@ class Tetris {
 
       if (lockedAboveTop) {
         this.live = false;
+        AudioMgr.playLose();
         showGameOverSplash();
         return;
       }
@@ -172,6 +204,7 @@ class Tetris {
 
       if (this.curr.collide(this.board, this.curr.x, this.curr.y, this.curr.mat)) {
         this.live = false;
+        AudioMgr.playLose();
         showGameOverSplash();
         return;
       }
@@ -188,9 +221,11 @@ class Tetris {
       ++cleared; ++y;
     }
     if (cleared) {
+      AudioMgr.playLine();
       this.lines += cleared;
       if (this.lines >= TARGET_LINES) {
         this.live = false;
+        AudioMgr.playWin();
         showClearSplash(this.lines);
       }
     }
@@ -245,7 +280,7 @@ function fitCanvasToViewport() {
   const canvas = document.getElementById("board");
   const controlsH = document.getElementById("touchControls")?.offsetHeight || 0;
   const goalbarH = document.getElementById("goalbar")?.offsetHeight || 0;
-  const EXTRA_BOTTOM = 100;
+  const EXTRA_BOTTOM = 90;
   document.documentElement.style.setProperty("--extra-bottom", EXTRA_BOTTOM + "px");
   const vw = window.visualViewport?.width ?? window.innerWidth;
   const vvh = window.visualViewport?.height ?? window.innerHeight;
@@ -396,7 +431,7 @@ window.addEventListener("load", () => {
 
   const splash = document.getElementById("splash");
   const startBtn = document.getElementById("startGame");
-  const start = () => { splash.style.display = "none"; window._tetris = new Tetris(); };
+  const start = () => { splash.style.display = "none"; window._tetris = new Tetris(); AudioMgr.startBGM(); };
   startBtn.addEventListener("click", start);
   document.addEventListener("keydown", (e) => { if (e.key === "Enter" && splash.style.display !== "none") start(); });
 });
