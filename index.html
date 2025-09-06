@@ -117,6 +117,37 @@
     <p>2025 所沢キャンパス祭 宝探し企画</p>
   </footer>
   <script type="module" src="./js/index.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const cleared = localStorage.getItem('th_cleared') === '1';
+      if (!cleared) return;
+
+      // 候補セレクタ（あなたのID/クラスに合わせてあれば使われる）
+      const selectorsStart = ['#startBtn', '#start-button', '[data-role="start"]', 'button.start', 'a.start'];
+      const selectorsContinue = ['#continueBtn', '#continue-button', '[data-role="continue"]', 'button.continue', 'a.continue'];
+
+      const hide = el => { if (!el) return; el.style.display = 'none'; el.setAttribute('aria-hidden', 'true'); el.tabIndex = -1; };
+
+      // 既知のID/クラスで隠す
+      selectorsStart.forEach(s => hide(document.querySelector(s)));
+      selectorsContinue.forEach(s => hide(document.querySelector(s)));
+
+      // 念のためテキストでも隠す（ID付いてない場合に効く）
+      document.querySelectorAll('button, a').forEach(el => {
+        const txt = (el.textContent || '').trim();
+        if (txt.includes('ゲームスタート') || txt.includes('続きから再開')) hide(el);
+      });
+
+      // 代わりの案内（任意）：ランキングへスクロールする簡易ボタン
+      const host = document.querySelector('#controls') || document.querySelector('main') || document.body;
+      const link = document.createElement('a');
+      link.href = '#leaderboard';
+      link.textContent = 'ランキングを見る';
+      link.style.cssText = 'display:inline-block;padding:.8em 1.2em;border-radius:10px;background:#0a7; color:#fff; text-decoration:none; margin-top:12px;';
+      host.prepend(link);
+    });
+  </script>
+
 </body>
 
 </html>

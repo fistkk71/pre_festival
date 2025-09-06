@@ -320,6 +320,7 @@ async function init() {
 
 
   async function runAfterGame() {
+    try { localStorage.setItem('th_cleared', '1'); } catch { }
     await playRewardFull();
     try {
       const ok = key ? await recordTreasureIfNeeded(key) : true;
