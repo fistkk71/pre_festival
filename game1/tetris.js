@@ -16,7 +16,7 @@ const SFX = (() => {
   const LS_KEY = 'tetris_audio_v1';
 
   // 初期値（好みで変更可）
-  const state = { master: 0.30, bgm: 0.20, sfx: 0.55 };
+  const state = { master: 0.25, bgm: 0.18, sfx: 0.45 };
 
   try {
     const saved = JSON.parse(localStorage.getItem(LS_KEY));
