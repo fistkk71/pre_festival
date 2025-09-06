@@ -25,8 +25,8 @@ function setButtonsIncomplete() {
 }
 
 function setButtonsComplete() {
-  rankBtn && (rankBtn.textContent = "ランキングを見る", rankBtn.classList.add("primary"), rankBtn.onclick = () => { localStorage.removeItem("uid"); location.href = "index.html"; });
-  homeBtn && (homeBtn.textContent = "トップへ戻る", homeBtn.onclick = () => { localStorage.removeItem("uid"); location.href = "index.html"; });
+  rankBtn && (rankBtn.textContent = "ランキングを見る", rankBtn.classList.add("primary"), rankBtn.onclick = () => { location.href = "index.html"; });
+  homeBtn && (homeBtn.textContent = "トップへ戻る", homeBtn.onclick = () => { location.href = "index.html"; });
 }
 
 async function ensureQRCodeLib() {
