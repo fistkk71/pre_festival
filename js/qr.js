@@ -248,8 +248,79 @@ async function init() {
     }
   }
 
+  function playRewardFull() {
+    return new Promise(async (resolve) => {
+      const overlay = document.createElement("div");
+      Object.assign(overlay.style, {
+        position: "fixed",
+        inset: "0",
+        background: "#000",
+        display: "grid",
+        placeItems: "center",
+        zIndex: "5000",
+      });
+
+      const video = document.createElement("video");
+      video.src = VIDEO_SRC;
+      video.playsInline = true;
+      video.setAttribute("webkit-playsinline", "");
+      video.autoplay = true;
+      video.muted = true;
+      video.controls = false;
+      video.setAttribute("controlsList", "nodownload noplaybackrate noremoteplayback");
+      video.disablePictureInPicture = true;
+
+      Object.assign(video.style, {
+        width: "100vw",
+        height: "100vh",
+        objectFit: "contain",
+        background: "#000",
+      });
+
+      overlay.appendChild(video);
+      document.body.appendChild(overlay);
+
+      let hideTimer = null;
+      const showControlsTemporarily = () => {
+        video.controls = true;
+        try {
+          video.muted = false;
+          video.play().catch(() => { });
+        } catch { }
+        clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => {
+          video.controls = false;
+        }, 2000);
+      };
+
+      overlay.addEventListener("pointerdown", showControlsTemporarily);
+
+      const finish = async () => {
+        overlay.removeEventListener("pointerdown", showControlsTemporarily);
+        clearTimeout(hideTimer);
+        try {
+          if (document.fullscreenElement) await document.exitFullscreen();
+        } catch { }
+        overlay.remove();
+        resolve();
+      };
+
+      video.addEventListener("ended", finish, { once: true });
+
+      video.play().catch(() => {
+        showControlsTemporarily();
+      });
+
+      try {
+        const p = overlay.requestFullscreen?.() || video.requestFullscreen?.();
+        if (p && typeof p.then === "function") await p;
+      } catch { }
+    });
+  }
+
+
   async function runAfterGame() {
-    showMovie(VIDEO_SRC);
+    await playRewardFull();
     try {
       const ok = key ? await recordTreasureIfNeeded(key) : true;
       if (!ok) return;
@@ -332,19 +403,3 @@ function ensureMovieLayer() {
   document.body.appendChild(layer);
   document.getElementById("mvClose")?.addEventListener("click", () => { layer.style.display = "none"; const v = document.getElementById("moviePlayer"); v && (v.pause(), v.removeAttribute("src"), v.load()); });
 }
-
-function showMovie(src) {
-  ensureMovieLayer();
-  const layer = document.getElementById("movieLayer");
-  const v = document.getElementById("moviePlayer");
-  if (!v) return;
-  layer.style.display = "grid";
-  v.src = src;
-  v.currentTime = 0;
-  try {
-    const p = layer.requestFullscreen?.() || v.requestFullscreen?.();
-    if (p && typeof p.then === "function") { p.catch(() => { }); }
-  } catch { }
-  v.play().catch(() => { });
-}
-

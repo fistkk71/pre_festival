@@ -12,20 +12,43 @@ let EXTRA_BOTTOM_PX = Number(PARAMS.get("bottom") || 90);
 
 // ==== Sound ====
 const SFX = (() => {
-  const bgm = new window.Audio("tetris_8bit.mp3"); bgm.loop = true; bgm.preload = "auto"; bgm.volume = 1.0;
-  const line = new window.Audio("line_8bit.mp3"); line.preload = "auto";
-  const win = new window.Audio("win_8bit.mp3"); win.preload = "auto";
-  const lose = new window.Audio("lose_8bit.mp3"); lose.preload = "auto";
+  const makePool = (src, size = 6, volume = 1.0) => {
+    const pool = Array.from({ length: size }, () => {
+      const a = new Audio(src);
+      a.preload = "auto";
+      a.volume = volume;
+      return a;
+    });
+    let idx = 0;
+    return {
+      play() {
+        const a = pool[idx];
+        idx = (idx + 1) % pool.length;
+        try {
+          a.currentTime = 0;
+          a.play();
+        } catch (e) {}
+      },
+      stopAll() {
+        pool.forEach(p => { try { p.pause(); p.currentTime = 0; } catch {} });
+      }
+    };
+  };
+
+  const bgm = new Audio("tetris_8bit.mp3"); bgm.loop = true; bgm.preload = "auto"; bgm.volume = 1.0;
+  const line = makePool("line_8bit.mp3", 8, 1.0);
+  const win  = makePool("win_8bit.mp3", 2, 1.0);
+  const lose = makePool("lose_8bit.mp3", 2, 1.0);
 
   return {
-    startBGM() { try { bgm.currentTime = 0; bgm.play(); } catch (e) { } },
-    stopBGM() { try { bgm.pause(); } catch (e) { } },
-    line() { try { line.currentTime = 0; line.play(); } catch (e) { } },
-    win() { this.stopBGM(); try { win.currentTime = 0; win.play(); } catch (e) { } },
-    lose() { this.stopBGM(); try { lose.currentTime = 0; lose.play(); } catch (e) { } },
+    startBGM() { try { bgm.currentTime = 0; bgm.play(); } catch (e) {} },
+    stopBGM()  { try { bgm.pause(); } catch (e) {} },
+
+    line() { line.play(); },
+    win()  { this.stopBGM(); win.play(); },
+    lose() { this.stopBGM(); lose.play(); },
   };
 })();
-
 
 
 // ---- 形状・色 ----
