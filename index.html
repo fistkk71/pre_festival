@@ -137,14 +137,6 @@
         const txt = (el.textContent || '').trim();
         if (txt.includes('ゲームスタート') || txt.includes('続きから再開')) hide(el);
       });
-
-      // 代わりの案内（任意）：ランキングへスクロールする簡易ボタン
-      const host = document.querySelector('#controls') || document.querySelector('main') || document.body;
-      const link = document.createElement('a');
-      link.href = '#leaderboard';
-      link.textContent = 'ランキングを見る';
-      link.style.cssText = 'display:inline-block;padding:.8em 1.2em;border-radius:10px;background:#0a7; color:#fff; text-decoration:none; margin-top:12px;';
-      host.prepend(link);
     });
   </script>
 
