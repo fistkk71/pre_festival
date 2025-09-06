@@ -1,7 +1,7 @@
 const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fistkk71.github.io"]; if (!ALLOWED.includes(location.origin)) location.replace("https://tokosai.net");
 
 import { db, ensureAuthed } from "./firebase-init.js";
-import { doc, getDoc, setDoc, collection, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { doc, getDoc, setDoc, updateDoc, collection, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 const fmt = (ms) => {
@@ -231,6 +231,23 @@ async function init() {
     return true;
   }
 
+  async function saveElapsedIfNeeded(uid) {
+    try {
+      const teamRef = doc(db, "teams", uid);
+      const snap = await getDoc(teamRef);
+      if (!snap.exists()) return;
+
+      const data = snap.data();
+      // まだ記録されていなくて startTime がある時だけ保存
+      if (!data.elapsed && data.startTime?.toMillis) {
+        const elapsed = Date.now() - data.startTime.toMillis(); // ms
+        await updateDoc(teamRef, { endTime: serverTimestamp(), elapsed });
+      }
+    } catch (e) {
+      console.error("[qr] saveElapsedIfNeeded failed:", e);
+    }
+  }
+
   async function runAfterGame() {
     showMovie(VIDEO_SRC);
     try {
@@ -239,6 +256,7 @@ async function init() {
       await updateHUD();
       const count = (await getDocs(collection(db, "teams", uid, "points"))).size;
       if (count >= TOTAL) {
+        await saveElapsedIfNeeded(uid);
         goalNote?.classList.remove("hidden");
         setPrimaryCTA("クーポン券を受け取る", () => { location.href = `goal.html?uid=${encodeURIComponent(uid)}`; });
       } else {
