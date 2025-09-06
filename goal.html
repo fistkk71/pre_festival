@@ -61,46 +61,34 @@
         <button id="homeBtn" class="btn-go secondary">トップへ戻る</button>
       </div>
     </div>
+  </main>
 
-        <section class="section" aria-label="トークショー告知">
-      <div class="container">
-        <div class="card" style="padding:16px;">
-          <p style="text-align:center;margin:0 0 12px;font-weight:800;">
-            所沢キャンパス祭 <strong>10/19</strong> に来ます！
-          </p>
+    <section class="promo" aria-label="トークショー告知">
+    <div class="promo-wrap">
+      <p class="promo-title">所沢キャンパス祭 <strong>10/19</strong> に来ます！</p>
 
-          <div style="
-        display:grid;
-        gap:12px;
-        grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-        align-items:start;">
-
-            <a href="https://t.livepocket.jp/e/kajiyuki" target="_blank" rel="noopener noreferrer"
-              aria-label="梶裕貴 TALK SHOWのチケットページを開く">
-              <img src="./image/kaji.jpg" width="595" height="842" alt="梶裕貴 TALK SHOW">
-            </a>
-
-            <a href="https://t.livepocket.jp/e/yabukinako" target="_blank" rel="noopener noreferrer"
-              aria-label="矢吹奈子 TALK SHOWのチケットページを開く">
-              <img src="./image/yabuki.jpg" width="595" height="842" alt="矢吹奈子 TALK SHOW">
-            </a>
-          </div>
-
-          <p style="text-align:center;margin-top:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;">
-            <a class="btn-primary" style="text-decoration:none" href="https://t.livepocket.jp/e/kajiyuki"
-              target="_blank" rel="noopener noreferrer">
-              梶裕貴 チケット
-            </a>
-            <a class="btn-secondary" style="text-decoration:none" href="https://t.livepocket.jp/e/yabukinako"
-              target="_blank" rel="noopener noreferrer">
-              矢吹奈子 チケット
-            </a>
-          </p>
+      <div class="promo-grid">
+        <!-- 梶裕貴 -->
+        <div class="promo-card">
+          <a href="https://t.livepocket.jp/e/kajiyuki" target="_blank" rel="noopener noreferrer"
+            aria-label="梶裕貴 TALK SHOWのチケットページを開く">
+            <img src="./image/kaji.jpg" alt="梶裕貴 TALK SHOW" loading="lazy">
+          </a>
+          <a class="btn-ticket" href="https://t.livepocket.jp/e/kajiyuki" target="_blank" rel="noopener noreferrer">梶裕貴
+            チケットを購入する</a>
+        </div>
+        <!-- 矢吹奈子 -->
+        <div class="promo-card">
+          <a href="https://t.livepocket.jp/e/yabukinako" target="_blank" rel="noopener noreferrer"
+            aria-label="矢吹奈子 TALK SHOWのチケットページを開く">
+            <img src="./image/yabuki.jpg" alt="矢吹奈子 TALK SHOW" loading="lazy">
+          </a>
+          <a class="btn-ticket" href="https://t.livepocket.jp/e/yabukinako" target="_blank"
+            rel="noopener noreferrer">矢吹奈子 チケットを購入する</a>
         </div>
       </div>
-    </section>
-
-  </main>
+    </div>
+  </section>
 
   <script type="module" src="./js/goal.js"></script>
   <footer class="footer">

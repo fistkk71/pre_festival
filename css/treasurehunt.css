@@ -1023,3 +1023,72 @@ body.scanner-open .footer {
 .scanner {
   padding-bottom: var(--sab);
 }
+
+/* === Talk Show Promo (per-card button) === */
+.promo {
+  padding: 16px 0;
+}
+
+.promo-wrap {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.promo-title {
+  text-align: center;
+  font-weight: 800;
+  margin: 0 0 12px;
+}
+
+/* 横2列→スマホ1列 */
+.promo-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+@media (max-width: 640px) {
+  .promo-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* カード: 画像の下にボタン */
+.promo-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.promo-card img {
+  width: 100%;
+  height: auto !important;
+  display: block;
+  border-radius: 8px;
+}
+
+/* 統一ボタン */
+.btn-ticket {
+  display: inline-block;
+  padding: 10px 16px;
+  border-radius: 9999px;
+  background: #1f3a5f;
+  color: #fff;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .15);
+  transition: transform .05s ease, filter .15s ease;
+  text-align: center;
+  min-width: 180px;
+}
+
+.btn-ticket:hover {
+  filter: brightness(1.05);
+}
+
+.btn-ticket:active {
+  transform: translateY(1px);
+}
