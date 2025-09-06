@@ -121,6 +121,7 @@ async function init() {
       placeEl && (placeEl.textContent = "次のスポットへお進みください。");
 
       if (count >= TOTAL) {
+        try { localStorage.setItem('th_cleared', '1'); } catch {}
         goalNote?.classList.remove("hidden");
         setPrimaryCTA("クーポン券を受け取る", () => {
           location.href = `goal.html?uid=${encodeURIComponent(uid)}`;
@@ -187,21 +188,6 @@ async function init() {
       const btn = setPrimaryCTA("プレイ中…", null, { disabled: true });
       for (let i = 3; i >= 1; i--) { if (btn) btn.textContent = `プレイ中… ${i}`; await sleep(1000); }
       resolve(true);
-    });
-  }
-  function playRewardFull() {
-    return new Promise(async (resolve) => {
-      const overlay = document.createElement("div");
-      Object.assign(overlay.style, { position: "fixed", inset: "0", background: "#000", display: "flex", alignItems: "center", justifyContent: "center", zIndex: "3000" });
-      const video = document.createElement("video");
-      video.src = VIDEO_SRC; video.playsInline = true; video.autoplay = true; video.muted = true; video.controls = false;
-      Object.assign(video.style, { width: "100vw", height: "100vh", objectFit: "contain", background: "#000" });
-      overlay.appendChild(video);
-      document.body.appendChild(overlay);
-      const finish = async () => { try { if (document.fullscreenElement) await document.exitFullscreen(); } catch { } overlay.remove(); resolve(); };
-      video.addEventListener("ended", finish, { once: true });
-      video.play().catch(() => { });
-      try { const p = overlay.requestFullscreen?.() || video.requestFullscreen?.(); if (p && typeof p.then === "function") await p; video.muted = false; } catch { }
     });
   }
 
@@ -320,7 +306,6 @@ async function init() {
 
 
   async function runAfterGame() {
-    try { localStorage.setItem('th_cleared', '1'); } catch { }
     await playRewardFull();
     try {
       const ok = key ? await recordTreasureIfNeeded(key) : true;
@@ -328,6 +313,7 @@ async function init() {
       await updateHUD();
       const count = (await getDocs(collection(db, "teams", uid, "points"))).size;
       if (count >= TOTAL) {
+        try { localStorage.setItem('th_cleared', '1'); } catch { }
         await saveElapsedIfNeeded(uid);
         goalNote?.classList.remove("hidden");
         setPrimaryCTA("クーポン券を受け取る", () => { location.href = `goal.html?uid=${encodeURIComponent(uid)}`; });

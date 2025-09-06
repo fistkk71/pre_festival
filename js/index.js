@@ -2,7 +2,7 @@ const ALLOWED = ["https://tokosai.net", "https://www.tokosai.net", "https://fist
 
 import { db } from "./firebase-init.js";
 import {
-  collection, query, where, orderBy, limit, onSnapshot,
+  collection, query, where, orderBy, limit, onSnapshot, getDocs,
   doc, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -33,20 +33,20 @@ function formatDuration(ms) {
   return h > 0 ? `${h}時間${m}分${s}秒` : `${m}分${s}秒`;
 }
 
-/* ---------- ランキング（上位10） ---------- */
+/* ---------- ランキング（上位5位） ---------- */
 const leaderboardRoot = document.getElementById("leaderboard-content");
 if (leaderboardRoot) {
   const q = query(
     collection(db, "teams"),
     where("elapsed", ">", 0),
     orderBy("elapsed", "asc"),
-    limit(10)
+    limit(5)
   );
-  onSnapshot(q, snap => {
+
+  const render = (snap) => {
     const ul = document.createElement("ul");
     ul.id = "rank";
     ul.className = "ranking-list";
-
     let i = 0;
     snap.forEach(d => {
       i += 1;
@@ -55,10 +55,31 @@ if (leaderboardRoot) {
       li.innerHTML = `<strong>${i}位</strong>　${teamName} — ${formatDuration(elapsed)}`;
       ul.appendChild(li);
     });
-
     leaderboardRoot.replaceChildren(ul);
-  });
+  };
+
+  const renderOnce = async () => {
+    const snap = await getDocs(q);
+    render(snap);
+  };
+
+  let fallbackTimer = null;
+
+  const unsubscribe = onSnapshot(
+    q,
+    (snap) => {
+      if (fallbackTimer) { clearInterval(fallbackTimer); fallbackTimer = null; }
+      render(snap);
+    },
+    async (err) => {
+      console.warn("[leaderboard] realtime disabled; fallback to polling:", err);
+      try { unsubscribe?.(); } catch { }
+      await renderOnce();
+      fallbackTimer = setInterval(renderOnce, 15000);
+    }
+  );
 }
+
 
 /* ---------- 「続きから再開」ボタン ---------- */
 (async () => {
