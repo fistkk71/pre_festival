@@ -81,7 +81,6 @@
         <h2>お問い合わせ</h2>
         <p>主催</p>
         <p>所沢キャンパス祭実行委員会</p>
-        <p>本部電話番号</p>
       </div>
     </section>
   </main>
@@ -117,28 +116,34 @@
     <p>2025 所沢キャンパス祭 宝探し企画</p>
   </footer>
   <script type="module" src="./js/index.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const cleared = localStorage.getItem('th_cleared') === '1';
-      if (!cleared) return;
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // JSTでYYYYMMDDを作る
+  const parts = new Intl.DateTimeFormat('ja-JP', {
+    timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit'
+  }).formatToParts(new Date());
+  const today = `${parts.find(p=>p.type==='year').value}${parts.find(p=>p.type==='month').value}${parts.find(p=>p.type==='day').value}`;
 
-      // 候補セレクタ（あなたのID/クラスに合わせてあれば使われる）
-      const selectorsStart = ['#startBtn', '#start-button', '[data-role="start"]', 'button.start', 'a.start'];
-      const selectorsContinue = ['#continueBtn', '#continue-button', '[data-role="continue"]', 'button.continue', 'a.continue'];
+  const uid = localStorage.getItem('uid');               // 参加者の端末だけ対象にする
+  let flag = localStorage.getItem('th_cleared');         // 旧実装の'1'対応＆日付外の掃除
+  if (flag === '1') { try { localStorage.setItem('th_cleared', today); flag = today; } catch {} }
+  if (flag && flag !== today) { try { localStorage.removeItem('th_cleared'); flag = null; } catch {} }
 
-      const hide = el => { if (!el) return; el.style.display = 'none'; el.setAttribute('aria-hidden', 'true'); el.tabIndex = -1; };
+  const cleared = !!uid && flag === today;               // 当日＆uidあり だけ隠す
+  if (!cleared) return;
 
-      // 既知のID/クラスで隠す
-      selectorsStart.forEach(s => hide(document.querySelector(s)));
-      selectorsContinue.forEach(s => hide(document.querySelector(s)));
-
-      // 念のためテキストでも隠す（ID付いてない場合に効く）
-      document.querySelectorAll('button, a').forEach(el => {
-        const txt = (el.textContent || '').trim();
-        if (txt.includes('ゲームスタート') || txt.includes('続きから再開')) hide(el);
-      });
-    });
-  </script>
+  // --- 以降は既存の「隠す」処理 ---
+  const selectorsStart = ['#startBtn', '#start-button', '[data-role="start"]', 'button.start', 'a.start'];
+  const selectorsContinue = ['#continueBtn', '#continue-button', '[data-role="continue"]', 'button.continue', 'a.continue'];
+  const hide = el => { if (!el) return; el.style.display = 'none'; el.setAttribute('aria-hidden', 'true'); el.tabIndex = -1; };
+  selectorsStart.forEach(s => hide(document.querySelector(s)));
+  selectorsContinue.forEach(s => hide(document.querySelector(s)));
+  document.querySelectorAll('button, a').forEach(el => {
+    const txt = (el.textContent || '').trim();
+    if (txt.includes('ゲームスタート') || txt.includes('続きから再開')) hide(el);
+  });
+});
+</script>
 
 </body>
 
