@@ -121,7 +121,7 @@ async function init() {
       placeEl && (placeEl.textContent = "次のスポットへお進みください。");
 
       if (count >= TOTAL) {
-        try { localStorage.setItem('th_cleared', '1'); } catch {}
+        try { localStorage.setItem('th_cleared', '1'); } catch { }
         goalNote?.classList.remove("hidden");
         setPrimaryCTA("クーポン券を受け取る", () => {
           location.href = `goal.html?uid=${encodeURIComponent(uid)}`;
