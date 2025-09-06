@@ -251,7 +251,7 @@ async function init() {
       video.playsInline = true;
       video.setAttribute("webkit-playsinline", "");
       video.autoplay = true;
-      video.muted = true;
+      video.muted = false;
       video.controls = false;
       video.setAttribute("controlsList", "nodownload noplaybackrate noremoteplayback");
       video.disablePictureInPicture = true;
@@ -294,6 +294,11 @@ async function init() {
       video.addEventListener("ended", finish, { once: true });
 
       video.play().catch(() => {
+        const onTapToPlay = () => {
+          try { video.currentTime = 0; video.muted = false; video.play().catch(() => { }); } catch { }
+          overlay.removeEventListener("pointerdown", onTapToPlay);
+        };
+        overlay.addEventListener("pointerdown", onTapToPlay, { once: true });
         showControlsTemporarily();
       });
 

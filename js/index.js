@@ -120,3 +120,19 @@ if (leaderboardRoot) {
     }
   } catch (_) { }
 })();
+
+(async () => {
+  try {
+    const uid = localStorage.getItem("uid");
+    if (!uid) return;
+    const team = (await getDoc(doc(db, "teams", uid))).data();
+    if (team?.elapsed && !team?.redeemedAt) {
+      const btn = document.createElement("a");
+      btn.href = "goal.html";            // uid なしでOK（localStorageから読む）
+      btn.className = "btn-secondary";
+      btn.style.marginLeft = "0.6rem";
+      btn.textContent = "景品引換QRを再表示";
+      document.querySelector(".hero-content")?.appendChild(btn);
+    }
+  } catch(_) {}
+})();
