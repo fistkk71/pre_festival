@@ -12,11 +12,24 @@ let EXTRA_BOTTOM_PX = Number(PARAMS.get("bottom") || 90);
 
 // ==== Sound ====
 const SFX = (() => {
-  const makePool = (src, size = 6, volume = 1.0) => {
+  const clamp = v => Math.max(0, Math.min(1, Number(v) || 0));
+  const LS_KEY = 'tetris_audio_v1';
+
+  // 初期値（好みで変更可）
+  const state = { master: 0.5, bgm: 0.35, sfx: 0.8 };
+
+  try {
+    const saved = JSON.parse(localStorage.getItem(LS_KEY));
+    if (saved && typeof saved === 'object') Object.assign(state, saved);
+  } catch {}
+
+  const save = () => { try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch {} };
+
+  const makePool = (src, size = 6, base = 1.0) => {
     const pool = Array.from({ length: size }, () => {
       const a = new Audio(src);
       a.preload = "auto";
-      a.volume = volume;
+      a.volume = base * state.sfx * state.master;
       return a;
     });
     let idx = 0;
@@ -24,32 +37,40 @@ const SFX = (() => {
       play() {
         const a = pool[idx];
         idx = (idx + 1) % pool.length;
-        try {
-          a.currentTime = 0;
-          a.play();
-        } catch (e) {}
+        try { a.currentTime = 0; a.play(); } catch {}
       },
-      stopAll() {
-        pool.forEach(p => { try { p.pause(); p.currentTime = 0; } catch {} });
-      }
+      updateVolume() {
+        const v = base * state.sfx * state.master;
+        pool.forEach(p => p.volume = v);
+      },
+      stopAll() { pool.forEach(p => { try { p.pause(); p.currentTime = 0; } catch {} }); }
     };
   };
 
-  const bgm = new Audio("tetris_8bit.mp3"); bgm.loop = true; bgm.preload = "auto"; bgm.volume = 1.0;
-  const line = makePool("line_8bit.mp3", 8, .6);
-  const win  = makePool("win_8bit.mp3", 2, .6);
-  const lose = makePool("lose_8bit.mp3", 2, .6);
+  const bgm = new Audio("tetris_8bit.mp3");
+  bgm.loop = true; bgm.preload = "auto";
+  const setBgmVol = () => { bgm.volume = state.bgm * state.master; };
+  setBgmVol();
+
+  const line = makePool("line_8bit.mp3", 8, 1.0);
+  const win  = makePool("win_8bit.mp3", 2, 1.0);
+  const lose = makePool("lose_8bit.mp3", 2, 1.0);
+
+  const updateAll = () => { setBgmVol(); line.updateVolume(); win.updateVolume(); lose.updateVolume(); };
 
   return {
     startBGM() { try { bgm.currentTime = 0; bgm.play(); } catch (e) {} },
     stopBGM()  { try { bgm.pause(); } catch (e) {} },
-
     line() { line.play(); },
     win()  { this.stopBGM(); win.play(); },
     lose() { this.stopBGM(); lose.play(); },
+
+    setMasterVolume(v) { state.master = clamp(v); save(); updateAll(); },
+    setBgmVolume(v)    { state.bgm    = clamp(v); save(); updateAll(); },
+    setSfxVolume(v)    { state.sfx    = clamp(v); save(); updateAll(); },
+    getVolumes()       { return { ...state }; }
   };
 })();
-
 
 // ---- 形状・色 ----
 const SHAPES = {
